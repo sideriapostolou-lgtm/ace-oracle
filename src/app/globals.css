@@ -1,0 +1,260 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── AceOracle Design System ─── */
+:root {
+  --bg: #050505;
+  --fg: #ededed;
+  --accent: #84cc16; /* lime-500 */
+  --accent-light: #a3e635; /* lime-400 */
+  --accent-dim: #65a30d; /* lime-600 */
+  --emerald: #10b981;
+  --gold: #f59e0b;
+  --gold-light: #fbbf24;
+  --surface: rgba(255, 255, 255, 0.05);
+  --border: rgba(255, 255, 255, 0.1);
+  --border-hover: rgba(255, 255, 255, 0.2);
+}
+
+body {
+  color: var(--fg);
+  background: var(--bg);
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ─── Glass Card ─── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+}
+.glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ─── Grid Background ─── */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ─── Court Background (subtle green radial) ─── */
+.court-bg {
+  background:
+    radial-gradient(
+      ellipse 80% 50% at 50% 0%,
+      rgba(132, 204, 22, 0.06),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 60% 40% at 80% 100%,
+      rgba(16, 185, 129, 0.04),
+      transparent
+    ),
+    var(--bg);
+}
+
+/* ─── Glow Effects ─── */
+.glow-lime {
+  box-shadow:
+    0 0 40px rgba(163, 230, 53, 0.15),
+    0 0 80px rgba(163, 230, 53, 0.05);
+}
+.text-glow-lime {
+  text-shadow: 0 0 40px rgba(163, 230, 53, 0.3);
+}
+
+/* ─── Lock of the Day Gold Glow ─── */
+.lock-glow {
+  box-shadow:
+    0 0 30px rgba(245, 158, 11, 0.3),
+    0 0 60px rgba(245, 158, 11, 0.15),
+    0 0 100px rgba(245, 158, 11, 0.05);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+@keyframes lock-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 30px rgba(245, 158, 11, 0.3),
+      0 0 60px rgba(245, 158, 11, 0.15),
+      0 0 100px rgba(245, 158, 11, 0.05);
+  }
+  50% {
+    box-shadow:
+      0 0 40px rgba(245, 158, 11, 0.4),
+      0 0 80px rgba(245, 158, 11, 0.2),
+      0 0 120px rgba(245, 158, 11, 0.1);
+  }
+}
+.lock-glow-animate {
+  animation: lock-pulse 3s ease-in-out infinite;
+}
+
+/* ─── Pulse for Live Matches ─── */
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+  }
+}
+.pulse-live {
+  animation: pulse-glow 2s infinite;
+}
+
+/* ─── Animations ─── */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+@keyframes count-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-count {
+  animation: count-up 0.6s ease-out forwards;
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.animate-slide-in-right {
+  animation: slide-in-right 0.4s ease-out forwards;
+}
+
+/* ─── Stagger Children ─── */
+.stagger-children > * {
+  opacity: 0;
+  animation: fade-in-up 0.4s ease-out forwards;
+}
+.stagger-children > *:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.stagger-children > *:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.stagger-children > *:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.stagger-children > *:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.stagger-children > *:nth-child(5) {
+  animation-delay: 0.25s;
+}
+.stagger-children > *:nth-child(6) {
+  animation-delay: 0.3s;
+}
+.stagger-children > *:nth-child(7) {
+  animation-delay: 0.35s;
+}
+.stagger-children > *:nth-child(8) {
+  animation-delay: 0.4s;
+}
+.stagger-children > *:nth-child(9) {
+  animation-delay: 0.45s;
+}
+.stagger-children > *:nth-child(10) {
+  animation-delay: 0.5s;
+}
+.stagger-children > *:nth-child(11) {
+  animation-delay: 0.55s;
+}
+.stagger-children > *:nth-child(12) {
+  animation-delay: 0.6s;
+}
+
+/* ─── Heading Font (Orbitron) ─── */
+.font-heading {
+  font-family: var(--font-orbitron), system-ui, sans-serif;
+  letter-spacing: 0.05em;
+}
+
+/* ─── Pick Button Hover States ─── */
+.pick-btn {
+  transition: all 0.2s ease;
+}
+.pick-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(132, 204, 22, 0.2);
+}
+.pick-btn.picked {
+  background: linear-gradient(135deg, #84cc16, #10b981);
+  color: black;
+  font-weight: 700;
+}
+
+/* ─── Factor Bar ─── */
+.factor-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+.factor-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+
+/* ─── Surface Colors ─── */
+.surface-hard {
+  color: #60a5fa;
+}
+.surface-clay {
+  color: #fb923c;
+}
+.surface-grass {
+  color: #4ade80;
+}
