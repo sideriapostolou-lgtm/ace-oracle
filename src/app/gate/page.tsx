@@ -1,7 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { Crown, Lock, CreditCard, Loader2, ArrowRight, Check, X, Zap, Target, TrendingUp, Trophy } from "lucide-react";
+import {
+  Crown,
+  Lock,
+  CreditCard,
+  Loader2,
+  ArrowRight,
+  Check,
+  X,
+  Zap,
+  Target,
+  TrendingUp,
+  Trophy,
+} from "lucide-react";
 
 export default function GatePage() {
   const [code, setCode] = useState("");
@@ -72,7 +84,8 @@ export default function GatePage() {
             AI Tennis Predictions for 99&cent;. Lifetime access.
           </p>
           <p className="mt-2 text-sm text-gray-500">
-            78% accuracy this season &middot; ATP, WTA &amp; Grand Slams &middot; Updated daily
+            78% accuracy this season &middot; ATP, WTA &amp; Grand Slams
+            &middot; Updated daily
           </p>
         </div>
 
@@ -82,9 +95,16 @@ export default function GatePage() {
             { icon: Target, label: "78% Accuracy", sub: "This season" },
             { icon: Zap, label: "AI Predictions", sub: "Every match" },
             { icon: Trophy, label: "Lock of the Day", sub: "Top confidence" },
-            { icon: TrendingUp, label: "Full Analysis", sub: "Factor breakdown" },
+            {
+              icon: TrendingUp,
+              label: "Full Analysis",
+              sub: "Factor breakdown",
+            },
           ].map((f) => (
-            <div key={f.label} className="glass-card flex flex-col items-center px-3 py-4 text-center">
+            <div
+              key={f.label}
+              className="glass-card flex flex-col items-center px-3 py-4 text-center"
+            >
               <f.icon className="mb-2 h-5 w-5 text-lime-400" />
               <p className="text-sm font-bold text-white">{f.label}</p>
               <p className="text-[11px] text-gray-500">{f.sub}</p>
@@ -94,8 +114,10 @@ export default function GatePage() {
 
         {/* Comparison Table */}
         <div className="glass-card mb-8 overflow-hidden">
-          <div className="border-b border-white/10 px-5 py-3">
-            <h3 className="text-sm font-bold text-white">Why Ace Oracle?</h3>
+          <div className="grid grid-cols-3 border-b border-white/10 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+            <span>Feature</span>
+            <span className="text-center text-lime-400">Ace Oracle</span>
+            <span className="text-center">Tennis Channel+</span>
           </div>
           <div className="divide-y divide-white/5">
             {[
@@ -103,33 +125,39 @@ export default function GatePage() {
               { feature: "Lock of the Day Picks", ace: true, tc: false },
               { feature: "Pick Tracking & History", ace: true, tc: false },
               { feature: "Factor Breakdown Analysis", ace: true, tc: false },
+              { feature: "Leaderboard & Points", ace: true, tc: false },
               { feature: "Live Match Streaming", ace: false, tc: true },
               { feature: "Price", ace: "$0.99 once", tc: "$110/yr" },
             ].map((row) => (
-              <div key={row.feature} className="grid grid-cols-3 items-center px-5 py-2.5 text-sm">
+              <div
+                key={row.feature}
+                className="grid grid-cols-3 items-center px-5 py-2.5 text-sm"
+              >
                 <span className="text-gray-400">{row.feature}</span>
                 <span className="text-center">
                   {typeof row.ace === "boolean" ? (
-                    row.ace ? <Check className="mx-auto h-4 w-4 text-lime-400" /> : <X className="mx-auto h-4 w-4 text-gray-600" />
+                    row.ace ? (
+                      <Check className="mx-auto h-4 w-4 text-lime-400" />
+                    ) : (
+                      <X className="mx-auto h-4 w-4 text-gray-600" />
+                    )
                   ) : (
                     <span className="font-bold text-lime-400">{row.ace}</span>
                   )}
                 </span>
                 <span className="text-center">
                   {typeof row.tc === "boolean" ? (
-                    row.tc ? <Check className="mx-auto h-4 w-4 text-gray-400" /> : <X className="mx-auto h-4 w-4 text-gray-600" />
+                    row.tc ? (
+                      <Check className="mx-auto h-4 w-4 text-gray-400" />
+                    ) : (
+                      <X className="mx-auto h-4 w-4 text-gray-600" />
+                    )
                   ) : (
                     <span className="text-gray-400">{row.tc}</span>
                   )}
                 </span>
               </div>
             ))}
-            {/* Column headers */}
-          </div>
-          <div className="grid grid-cols-3 border-t border-white/10 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-gray-600">
-            <span></span>
-            <span className="text-center text-lime-400">Ace Oracle</span>
-            <span className="text-center">Tennis Channel+</span>
           </div>
         </div>
 
@@ -182,7 +210,9 @@ export default function GatePage() {
         <div className="glass-card p-5">
           <div className="mb-3 flex items-center gap-3">
             <Lock className="h-4 w-4 text-lime-400" />
-            <span className="text-sm font-semibold text-white">Got an access code?</span>
+            <span className="text-sm font-semibold text-white">
+              Got an access code?
+            </span>
           </div>
           <form onSubmit={handleCodeSubmit} className="flex gap-2">
             <input
@@ -216,9 +246,12 @@ export default function GatePage() {
             {[
               { name: "BrandSnap", url: "https://brandforge-two.vercel.app" },
               { name: "SiteSnap", url: "https://omega-web-factory.vercel.app" },
-              { name: "Gridiron Oracle", url: "https://gridiron-oracle.vercel.app" },
+              {
+                name: "Gridiron Oracle",
+                url: "https://gridiron-oracle.vercel.app",
+              },
               { name: "Puck Prophet", url: "https://puck-prophet.vercel.app" },
-              { name: "SnapSafe", url: "https://snapsafe.vercel.app" },
+              { name: "SnapSafe", url: "https://snapsafe-seven.vercel.app" },
               { name: "Hub", url: "https://the99community.vercel.app" },
             ].map((p) => (
               <a
