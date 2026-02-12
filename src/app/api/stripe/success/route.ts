@@ -30,7 +30,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     response.cookies.set("ace_access", "granted", {
       maxAge: 365 * 24 * 60 * 60,
       path: "/",
-      httpOnly: true,
+      httpOnly: false,
       sameSite: "lax",
       secure: true,
     });
