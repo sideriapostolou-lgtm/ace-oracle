@@ -1,16 +1,20 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-function getStripe(): Stripe {
-  return new Stripe(process.env.STRIPE_SECRET_KEY!);
-}
-
 export const dynamic = "force-dynamic";
 
 export async function POST(): Promise<NextResponse> {
   try {
-    const stripe = getStripe();
-    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      return NextResponse.json(
+        { success: false, error: "Stripe key not configured", debug: "STRIPE_SECRET_KEY is empty" },
+        { status: 500 },
+      );
+    }
+
+    const stripe = new Stripe(key);
+    const baseUrl = process.env.NEXTAUTH_URL || "https://ace-oracle.vercel.app";
 
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -20,7 +24,7 @@ export async function POST(): Promise<NextResponse> {
           price_data: {
             currency: "usd",
             product_data: {
-              name: "AceOracle — Lifetime Access",
+              name: "Ace Oracle — Lifetime Access",
               description:
                 "One-time payment. All AI tennis predictions, Lock of the Day, full analysis, forever.",
             },
@@ -37,10 +41,11 @@ export async function POST(): Promise<NextResponse> {
       success: true,
       data: { url: checkoutSession.url },
     });
-  } catch (error) {
-    console.error("POST /api/stripe/checkout error:", error);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("POST /api/stripe/checkout error:", msg);
     return NextResponse.json(
-      { success: false, error: "Failed to create checkout session" },
+      { success: false, error: "Failed to create checkout session", detail: msg },
       { status: 500 },
     );
   }
