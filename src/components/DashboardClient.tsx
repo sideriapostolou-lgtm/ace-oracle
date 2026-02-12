@@ -37,7 +37,7 @@ export interface MatchWithPrediction {
 interface DashboardClientProps {
   matches: MatchWithPrediction[];
   lockOfDay: MatchWithPrediction | null;
-  userPicks: Record<string, string>; // matchId -> pickedPlayerId
+  userPicks: Record<string, string>;
 }
 
 export default function DashboardClient({
@@ -56,7 +56,6 @@ export default function DashboardClient({
       return;
     }
 
-    // If already picked same player, do nothing
     if (picks[matchId] === playerId) return;
 
     setLoadingMatch(matchId);
@@ -76,62 +75,69 @@ export default function DashboardClient({
   }
 
   return (
-    <div>
+    <>
       {/* Lock of the Day */}
       {lockOfDay && (
-        <div className="mb-8">
-          <LockOfTheDay
-            matchId={lockOfDay.id}
-            player1={lockOfDay.player1}
-            player2={lockOfDay.player2}
-            tournament={lockOfDay.tournament}
-            surface={lockOfDay.surface}
-            round={lockOfDay.round}
-            p1WinPct={lockOfDay.p1WinPct}
-            p2WinPct={lockOfDay.p2WinPct}
-            favoriteId={lockOfDay.favoriteId}
-            favoriteName={lockOfDay.favoriteName}
-            confidence={lockOfDay.confidence}
-            factors={lockOfDay.factors}
-            pickedPlayerId={picks[lockOfDay.id]}
-            onPick={handlePick}
-          />
+        <LockOfTheDay
+          matchId={lockOfDay.id}
+          player1={lockOfDay.player1}
+          player2={lockOfDay.player2}
+          tournament={lockOfDay.tournament}
+          surface={lockOfDay.surface}
+          round={lockOfDay.round}
+          p1WinPct={lockOfDay.p1WinPct}
+          p2WinPct={lockOfDay.p2WinPct}
+          favoriteId={lockOfDay.favoriteId}
+          favoriteName={lockOfDay.favoriteName}
+          confidence={lockOfDay.confidence}
+          factors={lockOfDay.factors}
+          pickedPlayerId={picks[lockOfDay.id]}
+          onPick={handlePick}
+        />
+      )}
+
+      {/* Divider */}
+      {lockOfDay && matches.length > 0 && (
+        <div className="net-divider">
+          <div className="net-divider-icon" />
         </div>
       )}
 
-      {/* Game Cards Grid */}
-      <div className="stagger-children grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {matches.map((match) => (
-          <GameCard
-            key={match.id}
-            matchId={match.id}
-            player1={match.player1}
-            player2={match.player2}
-            tournament={match.tournament}
-            round={match.round}
-            surface={match.surface}
-            startTime={match.startTime}
-            tour={match.tour}
-            p1WinPct={match.p1WinPct}
-            p2WinPct={match.p2WinPct}
-            factors={match.factors}
-            pickedPlayerId={picks[match.id]}
-            onPick={handlePick}
-            isPickLoading={loadingMatch === match.id}
-          />
-        ))}
-      </div>
-
-      {matches.length === 0 && (
-        <div className="glass-card py-16 text-center">
-          <p className="text-lg font-semibold text-gray-300">
-            No upcoming matches right now
-          </p>
-          <p className="mt-1 text-sm text-gray-500">
-            Check back soon for the next round of predictions
-          </p>
+      {/* All Other Matches */}
+      {matches.length > 0 ? (
+        <>
+          <div className="section-label">Today&apos;s Picks</div>
+          <div className="stagger">
+            {matches.map((match) => (
+              <GameCard
+                key={match.id}
+                matchId={match.id}
+                player1={match.player1}
+                player2={match.player2}
+                tournament={match.tournament}
+                round={match.round}
+                surface={match.surface}
+                startTime={match.startTime}
+                tour={match.tour}
+                p1WinPct={match.p1WinPct}
+                p2WinPct={match.p2WinPct}
+                confidence={match.confidence}
+                favoriteId={match.favoriteId}
+                favoriteName={match.favoriteName}
+                factors={match.factors}
+                pickedPlayerId={picks[match.id]}
+                onPick={handlePick}
+                isPickLoading={loadingMatch === match.id}
+              />
+            ))}
+          </div>
+        </>
+      ) : !lockOfDay ? (
+        <div className="no-matches">
+          <h3>No matches scheduled</h3>
+          <p>Check back tomorrow for fresh picks.</p>
         </div>
-      )}
-    </div>
+      ) : null}
+    </>
   );
 }

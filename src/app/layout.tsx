@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Orbitron } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SessionProvider from "@/components/SessionProvider";
 import TrialProvider from "@/components/TrialProvider";
@@ -15,9 +14,9 @@ const orbitron = Orbitron({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ace-oracle.vercel.app"),
-  title: "Ace Oracle | AI Tennis Predictions — 78% Accuracy",
+  title: "Ace Oracle | AI Tennis Predictions",
   description:
-    "AI-powered tennis predictions for ATP, WTA, and Grand Slam matches. Pick winners, track your record, and climb the leaderboard. $0.99 lifetime access.",
+    "AI-powered tennis predictions for ATP, WTA, and Grand Slam matches. One clear pick per match. $0.99 lifetime access.",
   keywords: [
     "tennis predictions",
     "ATP predictions",
@@ -32,9 +31,9 @@ export const metadata: Metadata = {
     canonical: "https://ace-oracle.vercel.app",
   },
   openGraph: {
-    title: "Ace Oracle | AI Tennis Predictions — 78% Accuracy",
+    title: "Ace Oracle | AI Tennis Predictions",
     description:
-      "Pick every tennis match with AI-powered predictions. 78% accuracy this season. $0.99 lifetime access — no subscriptions.",
+      "One clear pick per match. AI-powered tennis predictions. $0.99 lifetime access.",
     url: "https://ace-oracle.vercel.app",
     type: "website",
     siteName: "Ace Oracle",
@@ -51,7 +50,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Ace Oracle | AI Tennis Predictions",
     description:
-      "78% accuracy this season. AI-powered predictions for ATP, WTA & Grand Slams. $0.99 lifetime.",
+      "One clear pick per match. AI-powered predictions for ATP, WTA & Grand Slams. $0.99 lifetime.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -76,7 +75,7 @@ export default function RootLayout({
               "@type": "SoftwareApplication",
               name: "Ace Oracle",
               description:
-                "AI-powered tennis predictions for ATP, WTA, and Grand Slam matches. 78% accuracy this season.",
+                "AI-powered tennis predictions for ATP, WTA, and Grand Slam matches.",
               applicationCategory: "SportsApplication",
               operatingSystem: "Web",
               offers: {
@@ -94,13 +93,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body
-        className={`${inter.className} ${orbitron.variable} min-h-screen bg-[#050505] text-white antialiased`}
-      >
+      <body className={`${inter.className} ${orbitron.variable}`}>
         <SessionProvider>
           <TrialProvider>
-            <Navbar />
-            <main className="pt-16">{children}</main>
+            <main>{children}</main>
             <Footer />
           </TrialProvider>
         </SessionProvider>
