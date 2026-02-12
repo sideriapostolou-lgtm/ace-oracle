@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
 
 export const dynamic = "force-dynamic";
 
@@ -10,8 +9,18 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       return NextResponse.redirect(new URL("/gate", request.url));
     }
 
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2024-04-10" });
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      return NextResponse.redirect(new URL("/gate", request.url));
+    }
+
+    const res = await fetch(
+      `https://api.stripe.com/v1/checkout/sessions/${sessionId}`,
+      {
+        headers: { Authorization: `Bearer ${key}` },
+      },
+    );
+    const session = await res.json();
 
     if (session.payment_status !== "paid") {
       return NextResponse.redirect(new URL("/gate", request.url));
