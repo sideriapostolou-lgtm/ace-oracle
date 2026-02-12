@@ -139,14 +139,14 @@ export default function GatePage() {
           <div className="cross-sell-label">The 99&cent; Community</div>
           <div className="cross-sell-links">
             <a
-              href="https://gridiron-oracle.vercel.app"
+              href="https://gridiron-oracle.ngrok.io"
               target="_blank"
               rel="noopener noreferrer"
             >
               Gridiron Oracle
             </a>
             <a
-              href="https://puck-prophet.vercel.app"
+              href="https://puck-prophet.ngrok.io"
               target="_blank"
               rel="noopener noreferrer"
             >
