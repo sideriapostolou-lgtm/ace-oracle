@@ -103,7 +103,7 @@ export default async function HomePage() {
       <div className="stats-bar">
         <div className="stat">
           <div
-            className={`stat-value mono ${record.accuracy >= 55 ? "good" : record.accuracy < 50 ? "bad" : ""}`}
+            className={`stat-value mono ${record.total > 0 ? (record.accuracy >= 55 ? "good" : record.accuracy < 50 ? "bad" : "") : ""}`}
           >
             {record.wins}-{record.losses}
           </div>
@@ -111,9 +111,9 @@ export default async function HomePage() {
         </div>
         <div className="stat">
           <div
-            className={`stat-value mono ${record.accuracy >= 55 ? "good" : record.accuracy < 50 ? "bad" : ""}`}
+            className={`stat-value mono ${record.total > 0 ? (record.accuracy >= 55 ? "good" : record.accuracy < 50 ? "bad" : "") : ""}`}
           >
-            {record.accuracy}%
+            {record.total > 0 ? `${record.accuracy}%` : "—"}
           </div>
           <div className="stat-label">Accuracy</div>
         </div>
