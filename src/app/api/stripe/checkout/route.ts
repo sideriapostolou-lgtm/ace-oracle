@@ -8,12 +8,12 @@ export async function POST(): Promise<NextResponse> {
     const key = process.env.STRIPE_SECRET_KEY;
     if (!key) {
       return NextResponse.json(
-        { success: false, error: "Stripe key not configured", debug: "STRIPE_SECRET_KEY is empty" },
+        { success: false, error: "Stripe key not configured" },
         { status: 500 },
       );
     }
 
-    const stripe = new Stripe(key);
+    const stripe = new Stripe(key, { apiVersion: "2024-04-10" });
     const baseUrl = process.env.NEXTAUTH_URL || "https://ace-oracle.vercel.app";
 
     const checkoutSession = await stripe.checkout.sessions.create({
