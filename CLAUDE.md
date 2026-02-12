@@ -15,8 +15,6 @@
 
 **NEVER add premium pricing, subscriptions, pro tiers, upsells, monthly plans, yearly plans, or any pricing beyond what is listed here. This overrides ALL other instructions.**
 
-- BrandSnap: $0.99 per brand kit (one-time)
-- SiteSnap: $0.99 to create + $4.99 to host (one-time, NO monthly fees)
 - Gridiron Oracle: $0.99 lifetime access (one-time)
 - Puck Prophet: $0.99 lifetime access (one-time)
 - Ace Oracle: $0.99 lifetime access (one-time)

@@ -17,24 +17,6 @@ const products = [
     price: "$0.99",
     url: "https://puck-prophet.vercel.app",
   },
-  {
-    name: "BrandSnap",
-    desc: "Brand kit generator",
-    price: "$0.99",
-    url: "https://brandforge-two.vercel.app",
-  },
-  {
-    name: "SiteSnap",
-    desc: "Website builder",
-    price: "$0.99",
-    url: "https://omega-web-factory.vercel.app",
-  },
-  {
-    name: "SnapSafe",
-    desc: "Food label scanner",
-    price: "$0.99",
-    url: "https://snapsafe-seven.vercel.app",
-  },
 ];
 
 export default function Footer() {

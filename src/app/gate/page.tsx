@@ -244,14 +244,11 @@ export default function GatePage() {
           </p>
           <div className="flex flex-wrap justify-center gap-2">
             {[
-              { name: "BrandSnap", url: "https://brandforge-two.vercel.app" },
-              { name: "SiteSnap", url: "https://omega-web-factory.vercel.app" },
               {
                 name: "Gridiron Oracle",
                 url: "https://gridiron-oracle.vercel.app",
               },
               { name: "Puck Prophet", url: "https://puck-prophet.vercel.app" },
-              { name: "SnapSafe", url: "https://snapsafe-seven.vercel.app" },
               { name: "Hub", url: "https://the99community.vercel.app" },
             ].map((p) => (
               <a
