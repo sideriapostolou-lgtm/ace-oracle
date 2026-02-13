@@ -60,47 +60,78 @@ function buildEdgeBullets(
   const favIsP1 = favoriteId === p1.id;
   const fav = favIsP1 ? p1 : p2;
   const opp = favIsP1 ? p2 : p1;
+  const favLast = fav.name.split(" ").pop() ?? fav.name;
+  const oppLast = opp.name.split(" ").pop() ?? opp.name;
   const bullets: string[] = [];
 
+  // Bullet 1: Ranking
+  const rankGap = Math.abs(fav.ranking - opp.ranking);
   if (fav.ranking < opp.ranking) {
-    bullets.push(
-      `Ranked #${fav.ranking} vs #${opp.ranking} — clear ranking edge`,
-    );
+    if (rankGap > 30) {
+      bullets.push(`#${fav.ranking} vs #${opp.ranking} — massive ranking gap`);
+    } else if (rankGap > 10) {
+      bullets.push(
+        `Ranked #${fav.ranking} vs #${opp.ranking} — clear tier above`,
+      );
+    } else {
+      bullets.push(`#${fav.ranking} vs #${opp.ranking} — slight edge on paper`);
+    }
   } else if (fav.ranking > opp.ranking) {
     bullets.push(
-      `Ranked #${fav.ranking} vs #${opp.ranking} — other factors compensate`,
+      `Ranked #${fav.ranking} vs #${opp.ranking} — form and matchup override ranking`,
     );
   } else {
-    bullets.push(`Both ranked #${fav.ranking} — evenly matched on paper`);
+    bullets.push(`Both ranked #${fav.ranking} — comes down to the details`);
   }
 
+  // Bullet 2: Surface
   const favSurf = favIsP1 ? factors.surface.p1 : factors.surface.p2;
   const oppSurf = favIsP1 ? factors.surface.p2 : factors.surface.p1;
-  if (favSurf > oppSurf) {
+  if (favSurf > oppSurf + 10) {
     bullets.push(
-      `${favSurf}% ${surface.toLowerCase()} court factor vs ${oppSurf}%`,
+      `${favLast} dominates on ${surface.toLowerCase()} — ${favSurf}% vs ${oppSurf}%`,
+    );
+  } else if (favSurf > oppSurf) {
+    bullets.push(
+      `${surface} court favors ${favLast} (${favSurf}% vs ${oppSurf}%)`,
     );
   } else if (favSurf < oppSurf) {
     bullets.push(
-      `${surface} court slight disadvantage — offset by other metrics`,
+      `${oppLast} has the ${surface.toLowerCase()} edge but ranking + form compensate`,
+    );
+  } else {
+    bullets.push(
+      `Even ${surface.toLowerCase()} records — other factors decide this`,
     );
   }
 
+  // Bullet 3: H2H or Form
   if (!factors.h2h.label.includes("No Data")) {
     const favH2H = favIsP1 ? factors.h2h.p1 : factors.h2h.p2;
-    if (favH2H >= 50) {
-      bullets.push(`Favorable head-to-head: ${factors.h2h.label}`);
+    if (favH2H >= 65) {
+      bullets.push(`Owns the head-to-head: ${factors.h2h.label}`);
+    } else if (favH2H >= 50) {
+      bullets.push(`Leads head-to-head: ${factors.h2h.label}`);
     } else {
-      bullets.push(`${factors.h2h.label} — trails H2H but form favors`);
+      bullets.push(
+        `Trails ${factors.h2h.label} H2H but current form is superior`,
+      );
     }
-  }
-
-  if (bullets.length < 3) {
+  } else {
     const favForm = favIsP1 ? factors.form.p1 : factors.form.p2;
-    if (favForm > 55) {
-      bullets.push(`Strong current form — ${favForm}% season edge`);
+    const oppForm = favIsP1 ? factors.form.p2 : factors.form.p1;
+    if (favForm > 65) {
+      bullets.push(`${favLast} in peak form — ${favForm}% season win rate`);
+    } else if (favForm > oppForm + 10) {
+      bullets.push(
+        `Better current form: ${favLast} ${favForm}% vs ${oppLast} ${oppForm}%`,
+      );
+    } else if (favForm > 55) {
+      bullets.push(`Solid season form (${favForm}%) tips the balance`);
     } else {
-      bullets.push(`Comparable form — composite model gives the nod`);
+      bullets.push(
+        `Tight matchup — ranking and surface give ${favLast} the edge`,
+      );
     }
   }
 

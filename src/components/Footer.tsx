@@ -11,14 +11,14 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="footer-links">
         <a
-          href="https://gridiron-oracle.ngrok.io"
+          href="https://gridiron-oracle.vercel.app"
           target="_blank"
           rel="noopener noreferrer"
         >
           Gridiron Oracle
         </a>
         <a
-          href="https://puck-prophet.ngrok.io"
+          href="https://puck-prophet.vercel.app"
           target="_blank"
           rel="noopener noreferrer"
         >

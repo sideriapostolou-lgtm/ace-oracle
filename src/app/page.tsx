@@ -8,6 +8,15 @@ import { authOptions } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
+function isToday(date: Date): boolean {
+  const now = new Date();
+  return (
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate()
+  );
+}
+
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
 
@@ -77,19 +86,38 @@ export default async function HomePage() {
     };
   });
 
-  const lockOfDay =
-    matchesWithPredictions.length > 0
-      ? matchesWithPredictions.reduce((best, m) =>
-          m.confidence > best.confidence ? m : best,
-        )
-      : null;
+  // Split into today's matches and upcoming (future) matches
+  const todayMatches = matchesWithPredictions.filter((m) =>
+    isToday(new Date(m.startTime)),
+  );
+  const upcomingMatches = matchesWithPredictions.filter(
+    (m) => !isToday(new Date(m.startTime)),
+  );
 
-  const otherMatches = matchesWithPredictions.filter(
+  const hasMatchesToday = todayMatches.length > 0;
+
+  const lockOfDay = hasMatchesToday
+    ? todayMatches.reduce((best, m) =>
+        m.confidence > best.confidence ? m : best,
+      )
+    : null;
+
+  const otherTodayMatches = todayMatches.filter(
     (m) => m.id !== lockOfDay?.id,
   );
 
+  // For the "Next up" banner when no matches today
+  const nextMatch = upcomingMatches.length > 0 ? upcomingMatches[0] : null;
+  const nextTournament = nextMatch?.tournament ?? null;
+  const nextDate = nextMatch
+    ? new Date(nextMatch.startTime).toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+      })
+    : null;
+
   const record = await getSeasonRecord();
-  const matchCount = matches.length;
+  const todayCount = todayMatches.length;
 
   return (
     <div className="container">
@@ -118,16 +146,19 @@ export default async function HomePage() {
           <div className="stat-label">Accuracy</div>
         </div>
         <div className="stat">
-          <div className="stat-value mono">{matchCount}</div>
+          <div className="stat-value mono">{todayCount}</div>
           <div className="stat-label">Today</div>
         </div>
       </div>
 
       {/* Dashboard */}
       <DashboardClient
-        matches={otherMatches}
+        matches={hasMatchesToday ? otherTodayMatches : []}
         lockOfDay={lockOfDay}
         userPicks={userPicks}
+        upcomingMatches={hasMatchesToday ? [] : upcomingMatches}
+        nextTournament={nextTournament}
+        nextDate={nextDate}
       />
     </div>
   );

@@ -64,8 +64,9 @@ export function generatePrediction(
   surface: string,
 ): MatchPrediction {
   // Factor 1: Ranking (40% weight)
+  // Use steeper Elo curve (divisor 100 instead of 250) for wider spread
   const rankDiff = p2.ranking - p1.ranking;
-  const rankProb = 1 / (1 + Math.pow(10, -rankDiff / 250));
+  const rankProb = 1 / (1 + Math.pow(10, -rankDiff / 100));
   const rankPct1 = Math.round(rankProb * 100);
 
   // Factor 2: Surface (25% weight)
@@ -94,8 +95,12 @@ export function generatePrediction(
   const combined =
     rankProb * 0.4 + surfaceProb * 0.25 + h2hProb * 0.2 + formProb * 0.15;
 
-  // Clamp 5-95%
-  const p1Final = Math.min(0.95, Math.max(0.05, combined));
+  // Amplify distance from 50% for more decisive predictions
+  // Maps 0.5 -> 0.5, but stretches toward edges (e.g., 0.55 -> 0.60)
+  const amplified = 0.5 + (combined - 0.5) * 1.6;
+
+  // Clamp 15-85% (wider range, still reasonable)
+  const p1Final = Math.min(0.85, Math.max(0.15, amplified));
   const p1WinPct = Math.round(p1Final * 100);
   const p2WinPct = 100 - p1WinPct;
 
