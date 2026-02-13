@@ -171,8 +171,7 @@ function adjustWeights(mem: PredictionMemory): void {
   for (const factor of Object.keys(weights)) {
     if (factor in mem.factorAccuracy && mem.factorAccuracy[factor].total > 0) {
       const factorAcc = mem.factorAccuracy[factor].accuracy;
-      const adjustment =
-        1 + ((factorAcc - overallAcc) / 100.0) * LEARNING_RATE;
+      const adjustment = 1 + ((factorAcc - overallAcc) / 100.0) * LEARNING_RATE;
       weights[factor] = weights[factor] * adjustment;
     }
   }
@@ -222,10 +221,31 @@ function detectPatterns(mem: PredictionMemory): void {
     const [name, data] = sorted[0];
     const label =
       name.charAt(0).toUpperCase() + name.slice(1).replace(/_/g, " ");
-    patterns.push(`Most reliable factor: ${label} (${data.accuracy}% accurate)`);
+    patterns.push(
+      `Most reliable factor: ${label} (${data.accuracy}% accurate)`,
+    );
   }
 
   mem.patterns = patterns;
+}
+
+/**
+ * Tennis season state detection.
+ * Returns: "active", "offseason", or "preseason"
+ */
+export function getTennisSeasonState(): "active" | "offseason" | "preseason" {
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+
+  // Early January: Australian Open buildup
+  if (month === 1 && day < 8) return "preseason";
+
+  // Late November through December: offseason (after ATP Finals)
+  if (month === 12 || (month === 11 && day > 24)) return "offseason";
+
+  // Everything else: active tennis season
+  return "active";
 }
 
 export interface LearningStats {
