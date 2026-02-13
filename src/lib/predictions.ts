@@ -1,4 +1,5 @@
 import { h2hData } from "./tennis-data";
+import { getLearnedWeights, DEFAULT_WEIGHTS } from "./learning-engine";
 
 interface PlayerData {
   id: string;
@@ -63,20 +64,27 @@ export function generatePrediction(
   p2: PlayerData,
   surface: string,
 ): MatchPrediction {
-  // Factor 1: Ranking (40% weight)
-  // Use steeper Elo curve (divisor 100 instead of 250) for wider spread
+  // Load learned weights (or defaults)
+  let w: Record<string, number>;
+  try {
+    w = getLearnedWeights();
+  } catch {
+    w = { ...DEFAULT_WEIGHTS };
+  }
+
+  // Factor 1: Ranking
   const rankDiff = p2.ranking - p1.ranking;
   const rankProb = 1 / (1 + Math.pow(10, -rankDiff / 100));
   const rankPct1 = Math.round(rankProb * 100);
 
-  // Factor 2: Surface (25% weight)
+  // Factor 2: Surface
   const s1 = getSurfaceRate(p1.surfaceWin, surface);
   const s2 = getSurfaceRate(p2.surfaceWin, surface);
   const surfaceTotal = s1 + s2;
   const surfaceProb = surfaceTotal > 0 ? s1 / surfaceTotal : 0.5;
   const surfPct1 = Math.round(surfaceProb * 100);
 
-  // Factor 3: Head-to-Head (20% weight)
+  // Factor 3: Head-to-Head
   const h2h = findH2H(p1.name, p2.name);
   let h2hProb = 0.5;
   if (h2h && h2h.p1Wins + h2h.p2Wins > 0) {
@@ -84,16 +92,23 @@ export function generatePrediction(
   }
   const h2hPct1 = Math.round(h2hProb * 100);
 
-  // Factor 4: Form / Win Rate (15% weight)
+  // Factor 4: Form / Win Rate
   const form1 = getWinRate(p1.wonLost);
   const form2 = getWinRate(p2.wonLost);
   const formTotal = form1 + form2;
   const formProb = formTotal > 0 ? form1 / formTotal : 0.5;
   const formPct1 = Math.round(formProb * 100);
 
-  // Weighted combination
+  // Factor 5: Fatigue (neutral for now — no data source yet)
+  const fatigueProb = 0.5;
+
+  // Weighted combination using learned weights
   const combined =
-    rankProb * 0.4 + surfaceProb * 0.25 + h2hProb * 0.2 + formProb * 0.15;
+    rankProb * (w.ranking ?? 0.3) +
+    surfaceProb * (w.surface ?? 0.2) +
+    h2hProb * (w.h2h ?? 0.2) +
+    formProb * (w.form ?? 0.2) +
+    fatigueProb * (w.fatigue ?? 0.1);
 
   // Amplify distance from 50% for more decisive predictions
   // Maps 0.5 -> 0.5, but stretches toward edges (e.g., 0.55 -> 0.60)

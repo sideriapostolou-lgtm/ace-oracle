@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/db";
 import { generatePrediction } from "@/lib/predictions";
 import { getSeasonRecord } from "@/lib/result-checker";
+import { getLearningStats } from "@/lib/learning-engine";
 import DashboardClient from "@/components/DashboardClient";
+import LearningEngine from "@/components/LearningEngine";
 import type { MatchWithPrediction } from "@/components/DashboardClient";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -117,6 +119,7 @@ export default async function HomePage() {
     : null;
 
   const record = await getSeasonRecord();
+  const learningStats = getLearningStats();
   const todayCount = todayMatches.length;
 
   return (
@@ -150,6 +153,9 @@ export default async function HomePage() {
           <div className="stat-label">Today</div>
         </div>
       </div>
+
+      {/* AI Learning Engine */}
+      <LearningEngine stats={learningStats} />
 
       {/* Dashboard */}
       <DashboardClient
