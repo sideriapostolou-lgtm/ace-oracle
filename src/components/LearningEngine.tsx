@@ -91,6 +91,20 @@ export default function LearningEngine({ stats }: LearningEngineProps) {
         </div>
       )}
 
+      <div
+        style={{
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: ".58rem",
+          fontStyle: "italic",
+          color: "#84cc16",
+          letterSpacing: "1px",
+          marginBottom: "8px",
+          opacity: 0.85,
+        }}
+      >
+        Every game makes it smarter. Every pick makes it sharper. You just watch it become unstoppable.
+      </div>
+
       <div style={{ fontSize: ".62rem", color: "#525252", lineHeight: 1.6 }}>
         Currently weighting:{" "}
         {stats.weights.map((w, i) => (
