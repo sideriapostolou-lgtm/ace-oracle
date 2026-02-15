@@ -67,12 +67,29 @@ export default function SuccessPage() {
         </div>
 
         {/* Cross-sell section */}
-        <h2 style={styles.crossSellTitle}>Complete Your Toolkit</h2>
+        <h2 style={styles.crossSellTitle}>🏀 Complete Your Tournament Arsenal</h2>
         <p style={styles.crossSellSubtitle}>
-          Add AI predictions for NFL and NHL
+          March Madness is 19 days away - Don&apos;t bracket blind
         </p>
 
         <div style={styles.productGrid}>
+          {/* Basketball Oracle - Priority */}
+          <a
+            href="https://march-oracle.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{...styles.productCard, border: "1px solid rgba(251, 146, 60, 0.3)"}}
+          >
+            <div style={styles.productIcon}>🏀</div>
+            <h3 style={styles.productName}>Basketball Oracle</h3>
+            <p style={styles.productDesc}>March Madness AI predictions</p>
+            <div style={{...styles.productPrice, color: "#f97316"}}>$0.99</div>
+            <div style={{...styles.productCta, color: "#f97316"}}>Get March Madness Picks →</div>
+            <div style={{fontSize: "0.6rem", color: "#dc2626", fontWeight: 700, textTransform: "uppercase", marginTop: "4px"}}>
+              19 days to Selection Sunday!
+            </div>
+          </a>
+
           {/* Gridiron Oracle */}
           <a
             href="https://gridiron-oracle-next.vercel.app"
@@ -105,8 +122,7 @@ export default function SuccessPage() {
         {/* Bundle value prop */}
         <div style={styles.bundleBox}>
           <p style={styles.bundleText}>
-            All 3 AI tools: <strong>$2.97 total</strong> · Lifetime access · No
-            subscriptions
+            Tournament Arsenal Bundle: <strong>$3.96 → $2.97</strong> · All 4 AI tools · March Madness ready · No subscriptions
           </p>
         </div>
 
@@ -234,8 +250,8 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   productGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-    gap: "16px",
+    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+    gap: "12px",
     marginBottom: "24px",
   },
   productCard: {

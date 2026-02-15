@@ -15,3 +15,114 @@
  GET / 200 in 3476ms
  ✓ Compiled in 659ms (308 modules)
  ✓ Compiled in 147ms (308 modules)
+ ✓ Compiled /_not-found in 275ms (862 modules)
+ HEAD / 404 in 555ms
+ GET / 200 in 75ms
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/cookie' in /Users/sideriapostolou/ace-oracle/.next/server for build dependencies doesn't lead to expected result '/Users/sideriapostolou/ace-oracle/.next/server/vendor-chunks/cookie.js', but to 'Error: Can't resolve './vendor-chunks/cookie' in '/Users/sideriapostolou/ace-oracle/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/cookie (expected /Users/sideriapostolou/ace-oracle/.next/server/vendor-chunks/cookie.js)
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/.next/server/webpack-runtime.js
+<w>  at file /Users/sideriapostolou/ace-oracle/.next/server/webpack-runtime.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/.next/server/app/page.js
+<w>  at file /Users/sideriapostolou/ace-oracle/.next/server/app/page.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/require.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/utils.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/handle-externals.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/handle-externals.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at resolve commonjs /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/Users/sideriapostolou/ace-oracle/.next/server/vendor-chunks/cookie.js'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/oidc-token-hash' in /Users/sideriapostolou/ace-oracle/.next/server for build dependencies doesn't lead to expected result '/Users/sideriapostolou/ace-oracle/.next/server/vendor-chunks/oidc-token-hash.js', but to 'Error: Can't resolve './vendor-chunks/oidc-token-hash' in '/Users/sideriapostolou/ace-oracle/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/oidc-token-hash (expected /Users/sideriapostolou/ace-oracle/.next/server/vendor-chunks/oidc-token-hash.js)
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/.next/server/webpack-runtime.js
+<w>  at file /Users/sideriapostolou/ace-oracle/.next/server/webpack-runtime.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/.next/server/app/page.js
+<w>  at file /Users/sideriapostolou/ace-oracle/.next/server/app/page.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/require.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/utils.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/handle-externals.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/handle-externals.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at resolve commonjs /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/preact' in /Users/sideriapostolou/ace-oracle/.next/server for build dependencies doesn't lead to expected result '/Users/sideriapostolou/ace-oracle/.next/server/vendor-chunks/preact.js', but to 'Error: Can't resolve './vendor-chunks/preact' in '/Users/sideriapostolou/ace-oracle/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/preact (expected /Users/sideriapostolou/ace-oracle/.next/server/vendor-chunks/preact.js)
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/.next/server/webpack-runtime.js
+<w>  at file /Users/sideriapostolou/ace-oracle/.next/server/webpack-runtime.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/.next/server/app/page.js
+<w>  at file /Users/sideriapostolou/ace-oracle/.next/server/app/page.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/require.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/utils.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/handle-externals.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/handle-externals.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at resolve commonjs /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/clsx' in /Users/sideriapostolou/ace-oracle/.next/server for build dependencies doesn't lead to expected result '/Users/sideriapostolou/ace-oracle/.next/server/vendor-chunks/clsx.js', but to 'Error: Can't resolve './vendor-chunks/clsx' in '/Users/sideriapostolou/ace-oracle/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/clsx (expected /Users/sideriapostolou/ace-oracle/.next/server/vendor-chunks/clsx.js)
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/.next/server/webpack-runtime.js
+<w>  at file /Users/sideriapostolou/ace-oracle/.next/server/webpack-runtime.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/.next/server/app/page.js
+<w>  at file /Users/sideriapostolou/ace-oracle/.next/server/app/page.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/require.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/utils.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/handle-externals.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/handle-externals.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at resolve commonjs /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/tailwind-merge' in /Users/sideriapostolou/ace-oracle/.next/server for build dependencies doesn't lead to expected result '/Users/sideriapostolou/ace-oracle/.next/server/vendor-chunks/tailwind-merge.js', but to 'Error: Can't resolve './vendor-chunks/tailwind-merge' in '/Users/sideriapostolou/ace-oracle/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/tailwind-merge (expected /Users/sideriapostolou/ace-oracle/.next/server/vendor-chunks/tailwind-merge.js)
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/.next/server/webpack-runtime.js
+<w>  at file /Users/sideriapostolou/ace-oracle/.next/server/webpack-runtime.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/.next/server/app/page.js
+<w>  at file /Users/sideriapostolou/ace-oracle/.next/server/app/page.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/require.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/utils.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/handle-externals.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/handle-externals.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at resolve commonjs /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/preact-render-to-string' in /Users/sideriapostolou/ace-oracle/.next/server for build dependencies doesn't lead to expected result '/Users/sideriapostolou/ace-oracle/.next/server/vendor-chunks/preact-render-to-string.js', but to 'Error: Can't resolve './vendor-chunks/preact-render-to-string' in '/Users/sideriapostolou/ace-oracle/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/preact-render-to-string (expected /Users/sideriapostolou/ace-oracle/.next/server/vendor-chunks/preact-render-to-string.js)
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/.next/server/webpack-runtime.js
+<w>  at file /Users/sideriapostolou/ace-oracle/.next/server/webpack-runtime.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/.next/server/app/page.js
+<w>  at file /Users/sideriapostolou/ace-oracle/.next/server/app/page.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/require.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/utils.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/handle-externals.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/handle-externals.js
+<w>  at file dependencies /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at resolve commonjs /Users/sideriapostolou/ace-oracle/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+ POST /tweet 404 in 16ms
+ ✓ Compiled in 239ms (308 modules)
+ ✓ Compiled in 141ms (308 modules)
+ ✓ Compiled in 143ms (308 modules)
+ ✓ Compiled in 161ms (308 modules)
