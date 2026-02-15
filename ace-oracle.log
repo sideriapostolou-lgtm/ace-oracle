@@ -1,0 +1,17 @@
+
+> ace-oracle@0.1.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use, trying 3001 instead.
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3001
+  - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 1151ms
+ ✓ Compiled /src/middleware in 268ms (72 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 2.8s (891 modules)
+ GET / 200 in 3476ms
+ ✓ Compiled in 659ms (308 modules)
+ ✓ Compiled in 147ms (308 modules)

@@ -26,7 +26,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       return NextResponse.redirect(new URL("/gate", request.url));
     }
 
-    const response = NextResponse.redirect(new URL("/", request.url));
+    const response = NextResponse.redirect(new URL("/success", request.url));
     response.cookies.set("ace_access", "granted", {
       maxAge: 365 * 24 * 60 * 60,
       path: "/",

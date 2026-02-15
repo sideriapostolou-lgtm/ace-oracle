@@ -8,7 +8,7 @@ import type { MatchWithPrediction } from "@/components/DashboardClient";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 function isToday(date: Date): boolean {
   const now = new Date();
@@ -104,9 +104,7 @@ export default async function HomePage() {
       )
     : null;
 
-  const otherTodayMatches = todayMatches.filter(
-    (m) => m.id !== lockOfDay?.id,
-  );
+  const otherTodayMatches = todayMatches.filter((m) => m.id !== lockOfDay?.id);
 
   // For the "Next up" banner when no matches today
   const nextMatch = upcomingMatches.length > 0 ? upcomingMatches[0] : null;

@@ -60,11 +60,65 @@ export default function GatePage() {
   return (
     <div className="gate-page">
       <div className="gate-box">
+        {/* Social proof badge */}
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "6px 14px",
+            background: "rgba(34, 197, 94, 0.06)",
+            border: "1px solid rgba(34, 197, 94, 0.12)",
+            borderRadius: "20px",
+            marginBottom: "20px",
+            fontSize: "0.65rem",
+            fontFamily: "var(--mono)",
+            color: "#a3a3a3",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase" as const,
+          }}
+        >
+          <span
+            style={{
+              width: "6px",
+              height: "6px",
+              background: "#22c55e",
+              borderRadius: "50%",
+              animation: "pulse 2s ease-in-out infinite",
+            }}
+          />
+          Trusted by tennis fans worldwide
+        </div>
+
         <h1 className="font-heading">ACE ORACLE</h1>
         <p className="subtitle">AI Tennis Predictions</p>
 
         {/* Price card */}
         <div className="price-card">
+          {/* Price anchor */}
+          <div
+            style={{
+              marginBottom: "8px",
+              fontSize: "0.75rem",
+              fontFamily: "var(--mono)",
+              color: "#737373",
+              letterSpacing: "0.05em",
+            }}
+          >
+            <span
+              style={{
+                textDecoration: "line-through",
+                opacity: 0.5,
+                marginRight: "6px",
+              }}
+            >
+              $30/mo
+            </span>
+            <span style={{ color: "#22c55e", fontWeight: 600 }}>
+              vs our 99¢ one-time
+            </span>
+          </div>
+
           <div className="price-amount">$0.99</div>
           <div className="price-period">One-time &middot; Lifetime access</div>
           <button
@@ -78,9 +132,112 @@ export default function GatePage() {
                 style={{ width: 18, height: 18 }}
               />
             ) : (
-              "Get Access"
+              "Unlock Winning Picks"
             )}
           </button>
+
+          {/* Trust signals */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "16px",
+              marginTop: "16px",
+              paddingTop: "16px",
+              borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "0.6rem",
+                fontFamily: "var(--mono)",
+                color: "#737373",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                letterSpacing: "0.05em",
+              }}
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#22c55e"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+              Stripe Secure
+            </div>
+            <div
+              style={{
+                fontSize: "0.6rem",
+                fontFamily: "var(--mono)",
+                color: "#737373",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                letterSpacing: "0.05em",
+              }}
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#22c55e"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Lifetime Access
+            </div>
+            <div
+              style={{
+                fontSize: "0.6rem",
+                fontFamily: "var(--mono)",
+                color: "#737373",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                letterSpacing: "0.05em",
+              }}
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#22c55e"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="15" y1="9" x2="9" y2="15" />
+              </svg>
+              No Subscriptions
+            </div>
+          </div>
+
+          {/* Guarantee */}
+          <div
+            style={{
+              marginTop: "14px",
+              fontSize: "0.65rem",
+              fontFamily: "var(--mono)",
+              color: "#737373",
+              fontStyle: "italic",
+              letterSpacing: "0.02em",
+            }}
+          >
+            Not happy? Full refund, no questions.
+          </div>
         </div>
 
         {/* Divider */}

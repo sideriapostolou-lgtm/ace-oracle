@@ -18,6 +18,13 @@ export default function Footer() {
           Gridiron Oracle
         </a>
         <a
+          href="https://march-oracle.vercel.app"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          March Oracle
+        </a>
+        <a
           href="https://puck-prophet-next.vercel.app"
           target="_blank"
           rel="noopener noreferrer"
