@@ -126,3 +126,42 @@
  ✓ Compiled in 141ms (308 modules)
  ✓ Compiled in 143ms (308 modules)
  ✓ Compiled in 161ms (308 modules)
+ ⨯ TypeError: Cannot read properties of undefined (reading 'call')
+    at Object.__webpack_require__ [as require] (/Users/sideriapostolou/ace-oracle/.next/server/webpack-runtime.js:33:43)
+    at JSON.parse (<anonymous>)
+digest: "413923210"
+TypeError: Cannot read properties of undefined (reading 'call')
+    at Object.__webpack_require__ [as require] (/Users/sideriapostolou/ace-oracle/.next/server/webpack-runtime.js:33:43)
+    at require (/Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:40:20064)
+    at /Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:108376
+    at ea (/Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:108583)
+    at /Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:110813
+    at Object._fromJSON (/Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:111370)
+    at JSON.parse (<anonymous>)
+    at ec (/Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:109078)
+    at eo (/Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:108123)
+    at /Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:115291
+    at /Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:115308
+    at /Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:115341
+    at /Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:115358
+    at t (/Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:115581)
+ ⨯ TypeError: Cannot read properties of undefined (reading 'call')
+    at Object.__webpack_require__ [as require] (/Users/sideriapostolou/ace-oracle/.next/server/webpack-runtime.js:33:43)
+    at require (/Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:40:20064)
+    at /Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:108376
+    at ea (/Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:108583)
+    at /Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:110813
+    at Object._fromJSON (/Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:111370)
+    at JSON.parse (<anonymous>)
+    at ec (/Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:109078)
+    at eo (/Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:108123)
+    at /Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:115291
+    at /Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:115308
+    at /Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:115341
+    at /Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:115358
+    at t (/Users/sideriapostolou/ace-oracle/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:115581) {
+  page: '/'
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 824ms (1085 modules)
+ GET / 500 in 1027ms

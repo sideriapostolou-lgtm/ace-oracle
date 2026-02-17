@@ -310,6 +310,13 @@ export default function GatePage() {
               Puck Prophet
             </a>
             <a
+              href="https://march-oracle.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              March Oracle
+            </a>
+            <a
               href="https://the99community.vercel.app"
               target="_blank"
               rel="noopener noreferrer"
