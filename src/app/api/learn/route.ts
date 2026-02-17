@@ -17,16 +17,20 @@ interface ESPNCompetitor {
   athlete?: { displayName?: string };
   winner?: boolean;
   score?: { displayValue?: string };
+  linescores?: { value?: number }[];
+}
+
+interface ESPNCompetition {
+  competitors?: ESPNCompetitor[];
+  status?: { type?: { name?: string; state?: string } };
 }
 
 interface ESPNEvent {
   id: string;
   name?: string;
   status?: { type?: { name?: string; completed?: boolean } };
-  competitions?: Array<{
-    competitors?: ESPNCompetitor[];
-    status?: { type?: { name?: string } };
-  }>;
+  competitions?: ESPNCompetition[];
+  groupings?: Array<{ competitions?: ESPNCompetition[] }>;
 }
 
 interface ESPNScoreboard {
@@ -98,65 +102,83 @@ async function resolveFromESPN(): Promise<{
       const data = (await resp.json()) as ESPNScoreboard;
 
       for (const event of data.events ?? []) {
-        checked++;
-        const comp = event.competitions?.[0];
-        if (!comp) continue;
+        // ESPN tennis uses groupings[].competitions[], not event.competitions[0]
+        const allCompetitions: ESPNCompetition[] = [];
+        if (event.groupings) {
+          for (const grouping of event.groupings) {
+            if (grouping.competitions) {
+              allCompetitions.push(...grouping.competitions);
+            }
+          }
+        }
+        if (event.competitions) {
+          allCompetitions.push(...event.competitions);
+        }
 
-        const statusName =
-          comp.status?.type?.name ?? event.status?.type?.name ?? "";
-        if (statusName !== "STATUS_FINAL") continue;
+        for (const comp of allCompetitions) {
+          checked++;
 
-        const competitors = comp.competitors ?? [];
-        if (competitors.length !== 2) continue;
+          const statusState = comp.status?.type?.state ?? "";
+          const statusName = comp.status?.type?.name ?? "";
+          if (statusState !== "post" && statusName !== "STATUS_FINAL") continue;
 
-        // Find the winner
-        const winner = competitors.find((c) => c.winner === true);
-        if (!winner?.athlete?.displayName) continue;
+          const competitors = comp.competitors ?? [];
+          if (competitors.length !== 2) continue;
 
-        const p1Name = competitors[0]?.athlete?.displayName ?? "";
-        const p2Name = competitors[1]?.athlete?.displayName ?? "";
-        const winnerName = winner.athlete.displayName;
+          // Find the winner
+          const winner = competitors.find((c) => c.winner === true);
+          if (!winner?.athlete?.displayName) continue;
 
-        // Try to match against our pending matches
-        const key = [normalizeName(p1Name), normalizeName(p2Name)]
-          .sort()
-          .join("|");
-        const match = matchLookup.get(key);
+          const p1Name = competitors[0]?.athlete?.displayName ?? "";
+          const p2Name = competitors[1]?.athlete?.displayName ?? "";
+          const winnerName = winner.athlete.displayName;
 
-        if (match && pendingIds.has(match.matchId)) {
-          // Determine score string
-          const scores = competitors
-            .map((c) => c.score?.displayValue ?? "")
-            .join(", ");
+          // Try to match against our pending matches
+          const key = [normalizeName(p1Name), normalizeName(p2Name)]
+            .sort()
+            .join("|");
+          const match = matchLookup.get(key);
 
-          // Resolve in learning engine
-          const actualWinner =
-            normalizeName(winnerName) === normalizeName(match.player1Name)
-              ? match.player1Name
-              : match.player2Name;
+          if (match && pendingIds.has(match.matchId)) {
+            // Build score string from set scores
+            const scores = competitors
+              .map((c) => {
+                if (c.linescores?.length) {
+                  return c.linescores.map((s) => s.value ?? 0).join(" ");
+                }
+                return c.score?.displayValue ?? "";
+              })
+              .join(", ");
 
-          const didResolve = await resolveResultAsync(
-            match.matchId,
-            actualWinner,
-            scores || "completed",
-          );
+            // Resolve in learning engine
+            const actualWinner =
+              normalizeName(winnerName) === normalizeName(match.player1Name)
+                ? match.player1Name
+                : match.player2Name;
 
-          if (didResolve) {
-            resolved++;
+            const didResolve = await resolveResultAsync(
+              match.matchId,
+              actualWinner,
+              scores || "completed",
+            );
 
-            // Also update the match in DB
-            const dbPlayer = await prisma.player.findFirst({
-              where: { name: actualWinner },
-            });
-            if (dbPlayer) {
-              await prisma.match.update({
-                where: { id: match.matchId },
-                data: {
-                  status: "completed",
-                  winnerId: dbPlayer.id,
-                  score: scores || null,
-                },
+            if (didResolve) {
+              resolved++;
+
+              // Also update the match in DB
+              const dbPlayer = await prisma.player.findFirst({
+                where: { name: actualWinner },
               });
+              if (dbPlayer) {
+                await prisma.match.update({
+                  where: { id: match.matchId },
+                  data: {
+                    status: "completed",
+                    winnerId: dbPlayer.id,
+                    score: scores || null,
+                  },
+                });
+              }
             }
           }
         }
