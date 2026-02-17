@@ -1,10 +1,16 @@
 import fs from "fs";
 import path from "path";
+import { kv } from "@vercel/kv";
 
 const MEMORY_FILE = path.join(process.cwd(), "data", "prediction_memory.json");
+const KV_KEY = "prediction_memory";
 const LEARNING_RATE = 0.1;
 const MIN_PREDICTIONS_FOR_LEARNING = 5;
 const MIN_PREDICTIONS_FOR_PATTERNS = 10;
+
+function isKvAvailable(): boolean {
+  return !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+}
 
 export const DEFAULT_WEIGHTS: Record<string, number> = {
   ranking: 0.3,
@@ -63,6 +69,16 @@ function emptyMemory(): PredictionMemory {
   };
 }
 
+export async function loadPredictionMemoryFromKv(): Promise<PredictionMemory | null> {
+  if (!isKvAvailable()) return null;
+  try {
+    const data = await kv.get<PredictionMemory>(KV_KEY);
+    return data ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export function loadPredictionMemory(): PredictionMemory {
   try {
     if (fs.existsSync(MEMORY_FILE)) {
@@ -75,14 +91,10 @@ export function loadPredictionMemory(): PredictionMemory {
   return emptyMemory();
 }
 
-export function savePredictionMemory(data: PredictionMemory): void {
-  const dir = path.dirname(MEMORY_FILE);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  const tmp = MEMORY_FILE + ".tmp";
-  fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
-  fs.renameSync(tmp, MEMORY_FILE);
+export async function loadMemory(): Promise<PredictionMemory> {
+  const kvData = await loadPredictionMemoryFromKv();
+  if (kvData) return kvData;
+  return loadPredictionMemory();
 }
 
 export function getLearnedWeights(): Record<string, number> {
@@ -117,12 +129,74 @@ export function recordLearningPrediction(
   savePredictionMemory(mem);
 }
 
-export function resolveResult(
+export async function recordPredictionAsync(
+  matchId: string,
+  date: string,
+  player1: string,
+  player2: string,
+  predictedWinner: string,
+  confidence: number,
+  factors: Record<string, { favored: string }>,
+): Promise<void> {
+  const mem = await loadMemory();
+  if (mem.predictions.some((p) => p.matchId === matchId)) return;
+  mem.predictions.push({
+    matchId,
+    date,
+    player1,
+    player2,
+    predictedWinner,
+    confidence,
+    factors,
+    result: null,
+    actualWinner: null,
+    correct: null,
+  });
+  mem.totalPredictions = mem.predictions.length;
+  await saveMemory(mem);
+}
+
+export async function saveMemoryToKv(data: PredictionMemory): Promise<boolean> {
+  if (!isKvAvailable()) return false;
+  try {
+    await kv.set(KV_KEY, data);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function saveMemoryToFile(data: PredictionMemory): void {
+  try {
+    const dir = path.dirname(MEMORY_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    const tmp = MEMORY_FILE + ".tmp";
+    fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
+    fs.renameSync(tmp, MEMORY_FILE);
+  } catch {
+    // Vercel runtime is read-only — expected in production
+  }
+}
+
+export function savePredictionMemory(data: PredictionMemory): void {
+  saveMemoryToFile(data);
+}
+
+export async function saveMemory(data: PredictionMemory): Promise<void> {
+  const kvSaved = await saveMemoryToKv(data);
+  if (!kvSaved) {
+    saveMemoryToFile(data);
+  }
+}
+
+function applyResolution(
+  mem: PredictionMemory,
   matchId: string,
   actualWinner: string,
   score: string,
 ): boolean {
-  const mem = loadPredictionMemory();
   const pred = mem.predictions.find(
     (p) => p.matchId === matchId && p.result === null,
   );
@@ -160,8 +234,122 @@ export function resolveResult(
     detectPatterns(mem);
   }
 
+  return true;
+}
+
+export async function resolveResultAsync(
+  matchId: string,
+  actualWinner: string,
+  score: string,
+): Promise<boolean> {
+  const mem = await loadMemory();
+  if (!applyResolution(mem, matchId, actualWinner, score)) return false;
+  await saveMemory(mem);
+  return true;
+}
+
+export function resolveResult(
+  matchId: string,
+  actualWinner: string,
+  score: string,
+): boolean {
+  const mem = loadPredictionMemory();
+  if (!applyResolution(mem, matchId, actualWinner, score)) return false;
   savePredictionMemory(mem);
   return true;
+}
+
+/**
+ * Tennis season state detection.
+ * Returns: "active", "offseason", or "preseason"
+ */
+export function getTennisSeasonState(): "active" | "offseason" | "preseason" {
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+
+  // Early January: Australian Open buildup
+  if (month === 1 && day < 8) return "preseason";
+
+  // Late November through December: offseason (after ATP Finals)
+  if (month === 12 || (month === 11 && day > 24)) return "offseason";
+
+  // Everything else: active tennis season
+  return "active";
+}
+
+export interface LearningStats {
+  totalPredictions: number;
+  totalResolved: number;
+  totalCorrect: number;
+  accuracy: number;
+  patterns: string[];
+  patternCount: number;
+  weights: { name: string; pct: number }[];
+  lastUpdate: string | null;
+}
+
+const FACTOR_LABELS: Record<string, string> = {
+  ranking: "Rankings",
+  surface: "Surface",
+  h2h: "Head-to-Head",
+  form: "Form",
+  fatigue: "Fatigue",
+};
+
+export function getLearningStats(): LearningStats {
+  const mem = loadPredictionMemory();
+  const resolved = mem.predictions.filter((p) => p.correct !== null);
+  const weights = mem.learnedWeights ?? { ...DEFAULT_WEIGHTS };
+
+  const sortedWeights = Object.entries(weights)
+    .sort((a, b) => b[1] - a[1])
+    .map(([k, v]) => ({
+      name: FACTOR_LABELS[k] ?? k,
+      pct: Math.round(v * 1000) / 10,
+    }));
+
+  return {
+    totalPredictions: mem.totalPredictions ?? 0,
+    totalResolved: resolved.length,
+    totalCorrect: mem.totalCorrect ?? 0,
+    accuracy: mem.accuracy ?? 0,
+    patterns: mem.patterns ?? [],
+    patternCount: (mem.patterns ?? []).length,
+    weights: sortedWeights,
+    lastUpdate: mem.lastWeightUpdate ?? null,
+  };
+}
+
+export async function getLearningStatsAsync(): Promise<LearningStats> {
+  const mem = await loadMemory();
+  const resolved = mem.predictions.filter((p) => p.correct !== null);
+  const weights = mem.learnedWeights ?? { ...DEFAULT_WEIGHTS };
+
+  const sortedWeights = Object.entries(weights)
+    .sort((a, b) => b[1] - a[1])
+    .map(([k, v]) => ({
+      name: FACTOR_LABELS[k] ?? k,
+      pct: Math.round(v * 1000) / 10,
+    }));
+
+  return {
+    totalPredictions: mem.totalPredictions ?? 0,
+    totalResolved: resolved.length,
+    totalCorrect: mem.totalCorrect ?? 0,
+    accuracy: mem.accuracy ?? 0,
+    patterns: mem.patterns ?? [],
+    patternCount: (mem.patterns ?? []).length,
+    weights: sortedWeights,
+    lastUpdate: mem.lastWeightUpdate ?? null,
+  };
+}
+
+export async function getLearnedWeightsAsync(): Promise<
+  Record<string, number>
+> {
+  const mem = await loadMemory();
+  return mem.learnedWeights ?? { ...DEFAULT_WEIGHTS };
 }
 
 function adjustWeights(mem: PredictionMemory): void {
@@ -227,66 +415,4 @@ function detectPatterns(mem: PredictionMemory): void {
   }
 
   mem.patterns = patterns;
-}
-
-/**
- * Tennis season state detection.
- * Returns: "active", "offseason", or "preseason"
- */
-export function getTennisSeasonState(): "active" | "offseason" | "preseason" {
-  const now = new Date();
-  const month = now.getMonth() + 1;
-  const day = now.getDate();
-
-  // Early January: Australian Open buildup
-  if (month === 1 && day < 8) return "preseason";
-
-  // Late November through December: offseason (after ATP Finals)
-  if (month === 12 || (month === 11 && day > 24)) return "offseason";
-
-  // Everything else: active tennis season
-  return "active";
-}
-
-export interface LearningStats {
-  totalPredictions: number;
-  totalResolved: number;
-  totalCorrect: number;
-  accuracy: number;
-  patterns: string[];
-  patternCount: number;
-  weights: { name: string; pct: number }[];
-  lastUpdate: string | null;
-}
-
-const FACTOR_LABELS: Record<string, string> = {
-  ranking: "Rankings",
-  surface: "Surface",
-  h2h: "Head-to-Head",
-  form: "Form",
-  fatigue: "Fatigue",
-};
-
-export function getLearningStats(): LearningStats {
-  const mem = loadPredictionMemory();
-  const resolved = mem.predictions.filter((p) => p.correct !== null);
-  const weights = mem.learnedWeights ?? { ...DEFAULT_WEIGHTS };
-
-  const sortedWeights = Object.entries(weights)
-    .sort((a, b) => b[1] - a[1])
-    .map(([k, v]) => ({
-      name: FACTOR_LABELS[k] ?? k,
-      pct: Math.round(v * 1000) / 10,
-    }));
-
-  return {
-    totalPredictions: mem.totalPredictions ?? 0,
-    totalResolved: resolved.length,
-    totalCorrect: mem.totalCorrect ?? 0,
-    accuracy: mem.accuracy ?? 0,
-    patterns: mem.patterns ?? [],
-    patternCount: (mem.patterns ?? []).length,
-    weights: sortedWeights,
-    lastUpdate: mem.lastWeightUpdate ?? null,
-  };
 }

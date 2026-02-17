@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import {
   loadPredictionMemory,
-  resolveResult,
-  getLearningStats,
+  resolveResultAsync,
+  getLearningStatsAsync,
   getTennisSeasonState,
 } from "@/lib/learning-engine";
 
@@ -135,7 +135,7 @@ async function resolveFromESPN(): Promise<{
               ? match.player1Name
               : match.player2Name;
 
-          const didResolve = resolveResult(
+          const didResolve = await resolveResultAsync(
             match.matchId,
             actualWinner,
             scores || "completed",
@@ -183,7 +183,7 @@ export async function GET(): Promise<NextResponse> {
     espnResult = await resolveFromESPN();
   }
 
-  const stats = getLearningStats();
+  const stats = await getLearningStatsAsync();
 
   return NextResponse.json({
     success: true,
