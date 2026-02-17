@@ -11,12 +11,12 @@ export async function GET(): Promise<NextResponse> {
     );
 
     const history = resolved.map((p) => ({
-      gameId: p.matchId,
+      gameId: p.matchId ?? "",
       date: p.date,
-      away: p.player1,
-      home: p.player2,
-      predictedWinner: p.predictedWinner,
-      actualWinner: p.actualWinner,
+      away: p.player1 ?? "Player 1",
+      home: p.player2 ?? "Player 2",
+      predictedWinner: p.predictedWinner ?? "—",
+      actualWinner: p.actualWinner ?? "—",
       correct: p.correct,
       confidence: p.confidence,
       score: p.result,
