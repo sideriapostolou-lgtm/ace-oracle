@@ -78,7 +78,7 @@ export default async function MatchDetailPage({ params }: PageProps) {
 
   if (!match) notFound();
 
-  const prediction = generatePrediction(
+  const prediction = await generatePrediction(
     {
       id: match.player1.id,
       name: match.player1.name,

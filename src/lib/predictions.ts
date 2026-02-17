@@ -1,5 +1,10 @@
 import { h2hData } from "./tennis-data";
-import { getLearnedWeights, DEFAULT_WEIGHTS } from "./learning-engine";
+import {
+  getLearnedWeights,
+  DEFAULT_WEIGHTS,
+  getDynamicH2H,
+  loadMemory,
+} from "./learning-engine";
 
 interface PlayerData {
   id: string;
@@ -59,11 +64,38 @@ function findH2H(
   return null;
 }
 
-export function generatePrediction(
+/** Map round names to fatigue scores (deeper rounds = more tired) */
+const ROUND_FATIGUE: Record<string, number> = {
+  "Round of 128": 0,
+  "Round of 64": 0.02,
+  "Round of 32": 0.04,
+  "Round of 16": 0.06,
+  Quarterfinals: 0.08,
+  Semifinals: 0.1,
+  Final: 0.12,
+  "1st Round": 0,
+  "2nd Round": 0.02,
+  "3rd Round": 0.04,
+  "4th Round": 0.06,
+};
+
+function getRoundFatigue(round: string): number {
+  if (!round) return 0;
+  // Try exact match first, then partial match
+  if (ROUND_FATIGUE[round] !== undefined) return ROUND_FATIGUE[round];
+  const lower = round.toLowerCase();
+  for (const [key, val] of Object.entries(ROUND_FATIGUE)) {
+    if (lower.includes(key.toLowerCase())) return val;
+  }
+  return 0.03; // default for unknown rounds
+}
+
+export async function generatePrediction(
   p1: PlayerData,
   p2: PlayerData,
   surface: string,
-): MatchPrediction {
+  round?: string,
+): Promise<MatchPrediction> {
   // Load learned weights (or defaults)
   let w: Record<string, number>;
   try {
@@ -84,11 +116,39 @@ export function generatePrediction(
   const surfaceProb = surfaceTotal > 0 ? s1 / surfaceTotal : 0.5;
   const surfPct1 = Math.round(surfaceProb * 100);
 
-  // Factor 3: Head-to-Head
-  const h2h = findH2H(p1.name, p2.name);
+  // Factor 3: Head-to-Head (blend static + dynamic)
+  const staticH2H = findH2H(p1.name, p2.name);
   let h2hProb = 0.5;
-  if (h2h && h2h.p1Wins + h2h.p2Wins > 0) {
-    h2hProb = h2h.p1Wins / (h2h.p1Wins + h2h.p2Wins);
+  let h2hLabel = "H2H (No Data)";
+
+  // Try dynamic H2H from learning engine
+  let dynamicH2H: { p1Wins: number; p2Wins: number } | null = null;
+  try {
+    const mem = await loadMemory();
+    const dyn = getDynamicH2H(p1.name, p2.name, mem);
+    if (dyn && dyn.p1Wins + dyn.p2Wins > 0) {
+      dynamicH2H = dyn;
+    }
+  } catch {
+    // KV not available, skip dynamic H2H
+  }
+
+  if (dynamicH2H && staticH2H) {
+    // Blend: 60% dynamic (recent) + 40% static (historical)
+    const dynTotal = dynamicH2H.p1Wins + dynamicH2H.p2Wins;
+    const statTotal = staticH2H.p1Wins + staticH2H.p2Wins;
+    const dynProb = dynamicH2H.p1Wins / dynTotal;
+    const statProb = staticH2H.p1Wins / statTotal;
+    h2hProb = dynProb * 0.6 + statProb * 0.4;
+    const totalW = dynamicH2H.p1Wins + staticH2H.p1Wins;
+    const totalL = dynamicH2H.p2Wins + staticH2H.p2Wins;
+    h2hLabel = `H2H (${totalW}-${totalL})`;
+  } else if (dynamicH2H) {
+    h2hProb = dynamicH2H.p1Wins / (dynamicH2H.p1Wins + dynamicH2H.p2Wins);
+    h2hLabel = `H2H (${dynamicH2H.p1Wins}-${dynamicH2H.p2Wins})`;
+  } else if (staticH2H && staticH2H.p1Wins + staticH2H.p2Wins > 0) {
+    h2hProb = staticH2H.p1Wins / (staticH2H.p1Wins + staticH2H.p2Wins);
+    h2hLabel = `H2H (${staticH2H.p1Wins}-${staticH2H.p2Wins})`;
   }
   const h2hPct1 = Math.round(h2hProb * 100);
 
@@ -99,8 +159,12 @@ export function generatePrediction(
   const formProb = formTotal > 0 ? form1 / formTotal : 0.5;
   const formPct1 = Math.round(formProb * 100);
 
-  // Factor 5: Fatigue (neutral for now — no data source yet)
-  const fatigueProb = 0.5;
+  // Factor 5: Round Fatigue — deeper rounds favor higher-ranked players
+  const fatiguePenalty = getRoundFatigue(round || "");
+  // Higher-ranked player (lower number) is more conditioned for deep runs
+  // Apply a small boost to the favorite based on tournament depth
+  const rankAdvantage = p1.ranking < p2.ranking ? 1 : -1;
+  const fatigueProb = 0.5 + rankAdvantage * fatiguePenalty;
 
   // Weighted combination using learned weights
   const combined =
@@ -111,7 +175,6 @@ export function generatePrediction(
     fatigueProb * (w.fatigue ?? 0.1);
 
   // Amplify distance from 50% for more decisive predictions
-  // Maps 0.5 -> 0.5, but stretches toward edges (e.g., 0.55 -> 0.60)
   const amplified = 0.5 + (combined - 0.5) * 1.6;
 
   // Clamp 15-85% (wider range, still reasonable)
@@ -145,7 +208,7 @@ export function generatePrediction(
       h2h: {
         p1: h2hPct1,
         p2: 100 - h2hPct1,
-        label: h2h ? `H2H (${h2h.p1Wins}-${h2h.p2Wins})` : "H2H (No Data)",
+        label: h2hLabel,
       },
       form: {
         p1: formPct1,
