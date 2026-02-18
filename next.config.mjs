@@ -3,7 +3,7 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: "/:path*",
+        source: "/:path((?!api|_next|favicon.ico).*)",
         destination: "https://the99community.vercel.app/sports/tennis",
         permanent: true,
       },
