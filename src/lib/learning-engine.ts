@@ -122,7 +122,7 @@ function ensureV2(mem: PredictionMemory): PredictionMemory {
   return mem;
 }
 
-function emptyMemory(): PredictionMemory {
+export function emptyMemory(): PredictionMemory {
   return ensureV2({
     predictions: [],
     factorAccuracy: {

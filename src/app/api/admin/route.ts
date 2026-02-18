@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { kv } from "@vercel/kv";
 import {
-  saveMemoryToKv,
-  loadMemory,
+  emptyMemory,
   recordPredictionAsync,
   type PredictionMemory,
 } from "@/lib/learning-engine";
@@ -11,44 +11,11 @@ import { generatePrediction } from "@/lib/predictions";
 export const dynamic = "force-dynamic";
 
 const ADMIN_SECRET = process.env.ADMIN_SECRET ?? "REALONES";
+const KV_KEY = "prediction_memory";
 
 function checkAuth(request: NextRequest): boolean {
   const secret = new URL(request.url).searchParams.get("secret");
   return secret === ADMIN_SECRET;
-}
-
-function freshMemory(): PredictionMemory {
-  return {
-    predictions: [],
-    factorAccuracy: {
-      ranking: { correct: 0, total: 0, accuracy: 0 },
-      surface_context: { correct: 0, total: 0, accuracy: 0 },
-      round_depth: { correct: 0, total: 0, accuracy: 0 },
-      tour_dynamics: { correct: 0, total: 0, accuracy: 0 },
-    },
-    learnedWeights: {
-      ranking: 0.4,
-      surface_context: 0.25,
-      round_depth: 0.2,
-      tour_dynamics: 0.15,
-    },
-    patterns: [],
-    totalPredictions: 0,
-    totalCorrect: 0,
-    accuracy: 0,
-    lastWeightUpdate: null,
-    calibration: { buckets: {}, lastCalibrated: null },
-    rollingWindows: {
-      last10: { correct: 0, total: 0, accuracy: 0 },
-      last20: { correct: 0, total: 0, accuracy: 0 },
-      last50: { correct: 0, total: 0, accuracy: 0 },
-      history: [],
-    },
-    streaks: { current: 0, longestWin: 0, longestLoss: 0 },
-    upsetLog: [],
-    h2hResults: {},
-    version: 2,
-  };
 }
 
 /**
@@ -68,31 +35,40 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     new URL(request.url).searchParams.get("action") ?? "reset-and-record";
   const results: Record<string, unknown> = { action };
 
-  // Step 1: Reset tennis prediction memory (KV only — Prisma is read-only on Vercel)
+  // Step 1: Reset tennis prediction memory via direct KV operations
   if (action === "reset" || action === "reset-and-record") {
     try {
-      const oldMem = await loadMemory();
-      const oldStats = {
-        totalPredictions: oldMem.totalPredictions,
-        totalCorrect: oldMem.totalCorrect,
-        accuracy: oldMem.accuracy,
-        predictionsCount: oldMem.predictions.length,
-      };
+      // Read old stats first
+      const oldData = await kv.get<PredictionMemory>(KV_KEY);
+      const oldStats = oldData
+        ? {
+            totalPredictions: oldData.totalPredictions,
+            totalCorrect: oldData.totalCorrect,
+            accuracy: oldData.accuracy,
+            predictionsCount: oldData.predictions?.length ?? 0,
+          }
+        : {
+            totalPredictions: 0,
+            totalCorrect: 0,
+            accuracy: 0,
+            predictionsCount: 0,
+          };
 
-      // Write a completely fresh memory object to KV
-      const fresh = freshMemory();
-      const kvSaved = await saveMemoryToKv(fresh);
+      // Delete the key entirely, then write fresh
+      await kv.del(KV_KEY);
+      const fresh = emptyMemory();
+      await kv.set(KV_KEY, fresh);
 
-      // Verify the write by reading back
-      const verification = await loadMemory();
-      const verified = verification.predictions.length === 0;
+      // Verify with direct kv.get (not loadMemory which might cache)
+      const verification = await kv.get<PredictionMemory>(KV_KEY);
+      const verified =
+        verification !== null && (verification.predictions?.length ?? 0) === 0;
 
       results.reset = {
-        success: kvSaved && verified,
-        kvSaved,
-        verified,
+        success: verified,
         oldStats,
-        newPredictionsCount: verification.predictions.length,
+        newPredictionsCount: verification?.predictions?.length ?? "null",
+        verified,
       };
     } catch (error) {
       results.reset = {
