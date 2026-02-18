@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
 import {
-  saveMemory,
+  saveMemoryToKv,
   loadMemory,
   recordPredictionAsync,
+  type PredictionMemory,
 } from "@/lib/learning-engine";
 import { fetchAllTennisMatches } from "@/lib/espn-tennis";
 import { generatePrediction } from "@/lib/predictions";
@@ -15,6 +15,40 @@ const ADMIN_SECRET = process.env.ADMIN_SECRET ?? "REALONES";
 function checkAuth(request: NextRequest): boolean {
   const secret = new URL(request.url).searchParams.get("secret");
   return secret === ADMIN_SECRET;
+}
+
+function freshMemory(): PredictionMemory {
+  return {
+    predictions: [],
+    factorAccuracy: {
+      ranking: { correct: 0, total: 0, accuracy: 0 },
+      surface_context: { correct: 0, total: 0, accuracy: 0 },
+      round_depth: { correct: 0, total: 0, accuracy: 0 },
+      tour_dynamics: { correct: 0, total: 0, accuracy: 0 },
+    },
+    learnedWeights: {
+      ranking: 0.4,
+      surface_context: 0.25,
+      round_depth: 0.2,
+      tour_dynamics: 0.15,
+    },
+    patterns: [],
+    totalPredictions: 0,
+    totalCorrect: 0,
+    accuracy: 0,
+    lastWeightUpdate: null,
+    calibration: { buckets: {}, lastCalibrated: null },
+    rollingWindows: {
+      last10: { correct: 0, total: 0, accuracy: 0 },
+      last20: { correct: 0, total: 0, accuracy: 0 },
+      last50: { correct: 0, total: 0, accuracy: 0 },
+      history: [],
+    },
+    streaks: { current: 0, longestWin: 0, longestLoss: 0 },
+    upsetLog: [],
+    h2hResults: {},
+    version: 2,
+  };
 }
 
 /**
@@ -34,57 +68,32 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     new URL(request.url).searchParams.get("action") ?? "reset-and-record";
   const results: Record<string, unknown> = { action };
 
-  // Step 1: Reset tennis prediction memory
+  // Step 1: Reset tennis prediction memory (KV only — Prisma is read-only on Vercel)
   if (action === "reset" || action === "reset-and-record") {
     try {
-      const mem = await loadMemory();
+      const oldMem = await loadMemory();
       const oldStats = {
-        totalPredictions: mem.totalPredictions,
-        totalCorrect: mem.totalCorrect,
-        accuracy: mem.accuracy,
+        totalPredictions: oldMem.totalPredictions,
+        totalCorrect: oldMem.totalCorrect,
+        accuracy: oldMem.accuracy,
+        predictionsCount: oldMem.predictions.length,
       };
 
-      // Reset to empty memory with new factor keys
-      mem.predictions = [];
-      mem.factorAccuracy = {
-        ranking: { correct: 0, total: 0, accuracy: 0 },
-        surface_context: { correct: 0, total: 0, accuracy: 0 },
-        round_depth: { correct: 0, total: 0, accuracy: 0 },
-        tour_dynamics: { correct: 0, total: 0, accuracy: 0 },
-      };
-      mem.learnedWeights = {
-        ranking: 0.4,
-        surface_context: 0.25,
-        round_depth: 0.2,
-        tour_dynamics: 0.15,
-      };
-      mem.patterns = [];
-      mem.totalPredictions = 0;
-      mem.totalCorrect = 0;
-      mem.accuracy = 0;
-      mem.lastWeightUpdate = null;
-      mem.calibration = { buckets: {}, lastCalibrated: null };
-      mem.rollingWindows = {
-        last10: { correct: 0, total: 0, accuracy: 0 },
-        last20: { correct: 0, total: 0, accuracy: 0 },
-        last50: { correct: 0, total: 0, accuracy: 0 },
-        history: [],
-      };
-      mem.streaks = { current: 0, longestWin: 0, longestLoss: 0 };
-      mem.upsetLog = [];
-      mem.h2hResults = {};
+      // Write a completely fresh memory object to KV
+      const fresh = freshMemory();
+      const kvSaved = await saveMemoryToKv(fresh);
 
-      await saveMemory(mem);
+      // Verify the write by reading back
+      const verification = await loadMemory();
+      const verified = verification.predictions.length === 0;
 
-      // Also reset the PredictionRecord for current season
-      const year = new Date().getFullYear().toString();
-      await prisma.predictionRecord.upsert({
-        where: { season: year },
-        update: { wins: 0, losses: 0, pushes: 0, streak: 0 },
-        create: { season: year, wins: 0, losses: 0, pushes: 0, streak: 0 },
-      });
-
-      results.reset = { success: true, oldStats };
+      results.reset = {
+        success: kvSaved && verified,
+        kvSaved,
+        verified,
+        oldStats,
+        newPredictionsCount: verification.predictions.length,
+      };
     } catch (error) {
       results.reset = {
         success: false,
