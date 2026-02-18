@@ -453,25 +453,9 @@ function parseCompetition(
   };
 }
 
-// ─── Quick Prediction ───
+// ─── Add predictions to matches (uses full model, not quick hack) ───
 
-export function quickPrediction(
-  p1Rank: number,
-  p2Rank: number,
-): { p1WinPct: number; p2WinPct: number; confidence: number } {
-  const rankDiff = p2Rank - p1Rank;
-  const rankProb = 1 / (1 + Math.pow(10, -rankDiff / 100));
-  const amplified = 0.5 + (rankProb - 0.5) * 1.4;
-  const p1Final = Math.min(0.85, Math.max(0.15, amplified));
-  const p1WinPct = Math.round(p1Final * 100);
-  return {
-    p1WinPct,
-    p2WinPct: 100 - p1WinPct,
-    confidence: Math.abs(p1WinPct - 50) + 50,
-  };
-}
-
-// ─── Add predictions to matches ───
+import { generatePrediction } from "./predictions";
 
 export function addPredictions(groups: TournamentGroup[]): {
   groups: (TournamentGroup & { matches: ESPNMatchWithPrediction[] })[];
@@ -482,27 +466,36 @@ export function addPredictions(groups: TournamentGroup[]): {
   const enrichedGroups = groups.map((group) => {
     const enrichedMatches: ESPNMatchWithPrediction[] = group.matches.map(
       (match) => {
-        const pred = quickPrediction(
-          match.player1.ranking,
-          match.player2.ranking,
+        const pred = generatePrediction(
+          {
+            id: `${match.id}_p1`,
+            name: match.player1.name,
+            ranking: match.player1.ranking,
+          },
+          {
+            id: `${match.id}_p2`,
+            name: match.player2.name,
+            ranking: match.player2.ranking,
+          },
+          match.surface,
+          match.round,
+          match.tour,
         );
-        const favoriteName =
-          pred.p1WinPct >= pred.p2WinPct
-            ? match.player1.name
-            : match.player2.name;
 
         const enriched: ESPNMatchWithPrediction = {
           ...match,
           p1WinPct: pred.p1WinPct,
           p2WinPct: pred.p2WinPct,
           confidence: pred.confidence,
-          favoriteName,
+          favoriteName: pred.favoriteName,
         };
 
-        // Track Lock of the Day: highest confidence upcoming match
+        // Track Lock of the Day: highest win probability upcoming match
+        const winPct = Math.max(pred.p1WinPct, pred.p2WinPct);
         if (
           match.state === "pre" &&
-          (!lockOfDay || pred.confidence > lockOfDay.confidence)
+          (!lockOfDay ||
+            winPct > Math.max(lockOfDay.p1WinPct, lockOfDay.p2WinPct))
         ) {
           lockOfDay = enriched;
         }

@@ -78,24 +78,20 @@ export default async function MatchDetailPage({ params }: PageProps) {
 
   if (!match) notFound();
 
-  const prediction = await generatePrediction(
+  const prediction = generatePrediction(
     {
       id: match.player1.id,
       name: match.player1.name,
       ranking: match.player1.ranking,
-      surfaceWin: match.player1.surfaceWin,
-      wonLost: match.player1.wonLost,
-      titles: match.player1.titles,
     },
     {
       id: match.player2.id,
       name: match.player2.name,
       ranking: match.player2.ranking,
-      surfaceWin: match.player2.surfaceWin,
-      wonLost: match.player2.wonLost,
-      titles: match.player2.titles,
     },
     match.surface,
+    match.round ?? "",
+    match.tour ?? "ATP",
   );
 
   const p1 = match.player1;
@@ -235,23 +231,23 @@ export default async function MatchDetailPage({ params }: PageProps) {
             p2Name={p2.name.split(" ").pop() || p2.name}
           />
           <FactorRow
-            label={prediction.factors.surface.label}
-            p1={prediction.factors.surface.p1}
-            p2={prediction.factors.surface.p2}
+            label={prediction.factors.surface_context.label}
+            p1={prediction.factors.surface_context.p1}
+            p2={prediction.factors.surface_context.p2}
             p1Name={p1.name.split(" ").pop() || p1.name}
             p2Name={p2.name.split(" ").pop() || p2.name}
           />
           <FactorRow
-            label={prediction.factors.h2h.label}
-            p1={prediction.factors.h2h.p1}
-            p2={prediction.factors.h2h.p2}
+            label={prediction.factors.round_depth.label}
+            p1={prediction.factors.round_depth.p1}
+            p2={prediction.factors.round_depth.p2}
             p1Name={p1.name.split(" ").pop() || p1.name}
             p2Name={p2.name.split(" ").pop() || p2.name}
           />
           <FactorRow
-            label={prediction.factors.form.label}
-            p1={prediction.factors.form.p1}
-            p2={prediction.factors.form.p2}
+            label={prediction.factors.tour_dynamics.label}
+            p1={prediction.factors.tour_dynamics.p1}
+            p2={prediction.factors.tour_dynamics.p2}
             p1Name={p1.name.split(" ").pop() || p1.name}
             p2Name={p2.name.split(" ").pop() || p2.name}
           />

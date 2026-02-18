@@ -15,11 +15,10 @@ function isKvAvailable(): boolean {
 }
 
 export const DEFAULT_WEIGHTS: Record<string, number> = {
-  ranking: 0.3,
-  surface: 0.2,
-  h2h: 0.2,
-  form: 0.2,
-  fatigue: 0.1,
+  ranking: 0.4,
+  surface_context: 0.25,
+  round_depth: 0.2,
+  tour_dynamics: 0.15,
 };
 
 export interface FactorAccuracy {
@@ -128,10 +127,9 @@ function emptyMemory(): PredictionMemory {
     predictions: [],
     factorAccuracy: {
       ranking: { correct: 0, total: 0, accuracy: 0 },
-      surface: { correct: 0, total: 0, accuracy: 0 },
-      h2h: { correct: 0, total: 0, accuracy: 0 },
-      form: { correct: 0, total: 0, accuracy: 0 },
-      fatigue: { correct: 0, total: 0, accuracy: 0 },
+      surface_context: { correct: 0, total: 0, accuracy: 0 },
+      round_depth: { correct: 0, total: 0, accuracy: 0 },
+      tour_dynamics: { correct: 0, total: 0, accuracy: 0 },
     },
     learnedWeights: { ...DEFAULT_WEIGHTS },
     patterns: [],
@@ -388,11 +386,9 @@ function updateUpsetLog(mem: PredictionMemory, pred: PredictionEntry): void {
     tags.push("high_confidence_miss");
   }
 
-  // Surface specialist upset: surface factor was wrong
-  if (
-    pred.factors.surface?.favored &&
-    pred.actualWinner !== pred.factors.surface.favored
-  ) {
+  // Surface context upset: surface factor was wrong
+  const surfaceFactor = pred.factors.surface_context ?? pred.factors.surface;
+  if (surfaceFactor?.favored && pred.actualWinner !== surfaceFactor.favored) {
     tags.push("surface_upset");
   }
 
@@ -537,11 +533,10 @@ export function getTennisSeasonState(): "active" | "offseason" | "preseason" {
 }
 
 const FACTOR_LABELS: Record<string, string> = {
-  ranking: "Rankings",
-  surface: "Surface",
-  h2h: "Head-to-Head",
-  form: "Form",
-  fatigue: "Fatigue",
+  ranking: "Ranking",
+  surface_context: "Surface",
+  round_depth: "Round Depth",
+  tour_dynamics: "Tour Type",
 };
 
 export interface LearningStats {

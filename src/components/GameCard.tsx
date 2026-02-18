@@ -30,9 +30,13 @@ interface GameCardProps {
   isPickLoading?: boolean;
 }
 
-function getConfidenceLevel(confidence: number): "high" | "medium" | "low" {
-  if (confidence >= 70) return "high";
-  if (confidence >= 55) return "medium";
+function getConfidenceLevel(
+  p1WinPct: number,
+  p2WinPct: number,
+): "high" | "medium" | "low" {
+  const winPct = Math.max(p1WinPct, p2WinPct);
+  if (winPct >= 68) return "high";
+  if (winPct >= 58) return "medium";
   return "low";
 }
 
@@ -61,7 +65,6 @@ function buildEdgeBullets(
   const fav = favIsP1 ? p1 : p2;
   const opp = favIsP1 ? p2 : p1;
   const favLast = fav.name.split(" ").pop() ?? fav.name;
-  const oppLast = opp.name.split(" ").pop() ?? opp.name;
   const bullets: string[] = [];
 
   // Bullet 1: Ranking
@@ -78,61 +81,32 @@ function buildEdgeBullets(
     }
   } else if (fav.ranking > opp.ranking) {
     bullets.push(
-      `Ranked #${fav.ranking} vs #${opp.ranking} — form and matchup override ranking`,
+      `Ranked #${fav.ranking} vs #${opp.ranking} — matchup context overrides ranking`,
     );
   } else {
     bullets.push(`Both ranked #${fav.ranking} — comes down to the details`);
   }
 
-  // Bullet 2: Surface
-  const favSurf = favIsP1 ? factors.surface.p1 : factors.surface.p2;
-  const oppSurf = favIsP1 ? factors.surface.p2 : factors.surface.p1;
-  if (favSurf > oppSurf + 10) {
-    bullets.push(
-      `${favLast} dominates on ${surface.toLowerCase()} — ${favSurf}% vs ${oppSurf}%`,
-    );
-  } else if (favSurf > oppSurf) {
-    bullets.push(
-      `${surface} court favors ${favLast} (${favSurf}% vs ${oppSurf}%)`,
-    );
-  } else if (favSurf < oppSurf) {
-    bullets.push(
-      `${oppLast} has the ${surface.toLowerCase()} edge but ranking + form compensate`,
-    );
+  // Bullet 2: Surface context
+  const surfaceLower = surface.toLowerCase();
+  if (surfaceLower === "clay") {
+    bullets.push(`Clay court — higher upset potential, unpredictable surface`);
+  } else if (surfaceLower === "grass") {
+    bullets.push(`Grass court — serve-dominant, favors the higher seed`);
   } else {
-    bullets.push(
-      `Even ${surface.toLowerCase()} records — other factors decide this`,
-    );
+    bullets.push(`Hard court — neutral surface, ranking advantage holds`);
   }
 
-  // Bullet 3: H2H or Form
-  if (!factors.h2h.label.includes("No Data")) {
-    const favH2H = favIsP1 ? factors.h2h.p1 : factors.h2h.p2;
-    if (favH2H >= 65) {
-      bullets.push(`Owns the head-to-head: ${factors.h2h.label}`);
-    } else if (favH2H >= 50) {
-      bullets.push(`Leads head-to-head: ${factors.h2h.label}`);
-    } else {
-      bullets.push(
-        `Trails ${factors.h2h.label} H2H but current form is superior`,
-      );
-    }
+  // Bullet 3: Round depth
+  const roundProb = factors.round_depth.p1;
+  if (roundProb <= 45) {
+    bullets.push(
+      `Deep round — both players battle-tested, tight matchup expected`,
+    );
+  } else if (roundProb >= 58) {
+    bullets.push(`Early round — ${favLast} should advance comfortably`);
   } else {
-    const favForm = favIsP1 ? factors.form.p1 : factors.form.p2;
-    const oppForm = favIsP1 ? factors.form.p2 : factors.form.p1;
-    if (favForm > 65) {
-      bullets.push(`${favLast} in peak form — ${favForm}% season win rate`);
-    } else if (favForm > oppForm + 10) {
-      bullets.push(
-        `Better current form: ${favLast} ${favForm}% vs ${oppLast} ${oppForm}%`,
-      );
-    } else if (favForm > 55) {
-      bullets.push(`Solid season form (${favForm}%) tips the balance`);
-    } else {
-      bullets.push(
-        `Tight matchup — ranking and surface give ${favLast} the edge`,
-      );
-    }
+    bullets.push(`Mid-tournament — quality opponent, ranking matters`);
   }
 
   return bullets.slice(0, 3);
@@ -146,12 +120,14 @@ export default function GameCard({
   surface,
   startTime,
   tour,
-  confidence,
+  p1WinPct,
+  p2WinPct,
   favoriteId,
   favoriteName,
   factors,
 }: GameCardProps) {
-  const confLevel = getConfidenceLevel(confidence);
+  const confLevel = getConfidenceLevel(p1WinPct, p2WinPct);
+  const winPct = Math.max(p1WinPct, p2WinPct);
   const p1Last = player1.name.split(" ").pop() ?? player1.name;
   const p2Last = player2.name.split(" ").pop() ?? player2.name;
   const favLast = favoriteName.split(" ").pop() ?? favoriteName;
@@ -206,7 +182,7 @@ export default function GameCard({
           <span className="pick-arrow">&rarr;</span>
           <span className="pick-name">{favLast}</span>
         </div>
-        <span className={`pick-conf ${confLevel}`}>{confidence}%</span>
+        <span className={`pick-conf ${confLevel}`}>{winPct}%</span>
       </div>
 
       {/* THE EDGE — always visible bullets */}

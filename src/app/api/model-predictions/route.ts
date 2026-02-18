@@ -22,33 +22,27 @@ export async function GET(): Promise<NextResponse> {
 
     const predictions = await Promise.all(
       matches.map(async (match) => {
-        const prediction = await generatePrediction(
+        const prediction = generatePrediction(
           {
             id: match.player1.id,
             name: match.player1.name,
             ranking: match.player1.ranking,
-            surfaceWin: match.player1.surfaceWin,
-            wonLost: match.player1.wonLost,
-            titles: match.player1.titles,
           },
           {
             id: match.player2.id,
             name: match.player2.name,
             ranking: match.player2.ranking,
-            surfaceWin: match.player2.surfaceWin,
-            wonLost: match.player2.wonLost,
-            titles: match.player2.titles,
           },
           match.surface,
-          match.round ?? undefined,
+          match.round ?? "",
+          match.tour ?? "ATP",
         );
 
-        const tier =
-          prediction.confidence >= 70
-            ? "LOCK"
-            : prediction.confidence >= 60
-              ? "STRONG"
-              : "LEAN";
+        const winPct =
+          prediction.p1WinPct >= prediction.p2WinPct
+            ? prediction.p1WinPct
+            : prediction.p2WinPct;
+        const tier = winPct >= 68 ? "LOCK" : winPct >= 58 ? "STRONG" : "LEAN";
 
         return {
           gameId: match.id,

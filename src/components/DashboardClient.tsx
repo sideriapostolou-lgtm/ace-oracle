@@ -9,9 +9,13 @@ interface DashboardClientProps {
   fetchError: boolean;
 }
 
-function getConfidenceLevel(confidence: number): "high" | "medium" | "low" {
-  if (confidence >= 70) return "high";
-  if (confidence >= 55) return "medium";
+function getConfidenceLevel(
+  p1WinPct: number,
+  p2WinPct: number,
+): "high" | "medium" | "low" {
+  const winPct = Math.max(p1WinPct, p2WinPct);
+  if (winPct >= 68) return "high";
+  if (winPct >= 58) return "medium";
   return "low";
 }
 
@@ -258,8 +262,10 @@ function MatchCard({ match }: { match: ESPNMatchWithPrediction }) {
             <span className="pick-arrow">&rarr;</span>
             <span className="pick-name">{getLastName(match.favoriteName)}</span>
           </div>
-          <span className={`pick-conf ${getConfidenceLevel(match.confidence)}`}>
-            {match.confidence}%
+          <span
+            className={`pick-conf ${getConfidenceLevel(match.p1WinPct, match.p2WinPct)}`}
+          >
+            {Math.max(match.p1WinPct, match.p2WinPct)}%
           </span>
         </div>
       )}
@@ -317,11 +323,12 @@ function buildQuickBullets(match: ESPNMatchWithPrediction): string[] {
     `${match.surface} court specialist \u2014 ${favLast} holds the advantage`,
   );
 
-  if (match.confidence >= 70) {
-    bullets.push(`High confidence pick at ${match.confidence}%`);
-  } else if (match.confidence >= 55) {
+  const winPct = Math.max(match.p1WinPct, match.p2WinPct);
+  if (winPct >= 68) {
+    bullets.push(`High confidence pick at ${winPct}% win probability`);
+  } else if (winPct >= 58) {
     bullets.push(
-      `Moderate edge \u2014 ${favLast} favored at ${match.p1WinPct > match.p2WinPct ? match.p1WinPct : match.p2WinPct}% win probability`,
+      `Moderate edge \u2014 ${favLast} favored at ${winPct}% win probability`,
     );
   } else {
     bullets.push(
@@ -338,8 +345,8 @@ function LockOfDaySection({ match }: { match: ESPNMatchWithPrediction }) {
   const favLast = getLastName(match.favoriteName);
   const favIsP1 = match.p1WinPct >= match.p2WinPct;
   const favorite = favIsP1 ? match.player1 : match.player2;
-  const confClass =
-    match.confidence >= 70 ? "" : match.confidence >= 55 ? "medium" : "low";
+  const lockWinPct = Math.max(match.p1WinPct, match.p2WinPct);
+  const confClass = lockWinPct >= 68 ? "" : lockWinPct >= 58 ? "medium" : "low";
   const surfaceClass = `lock-surface-${match.surface.toLowerCase()}`;
   const surfaceMetaClass = `meta-surface-${match.surface.toLowerCase()}`;
 
@@ -361,7 +368,7 @@ function LockOfDaySection({ match }: { match: ESPNMatchWithPrediction }) {
       <div className="confidence-bar">
         <div
           className={`confidence-fill ${confClass}`}
-          style={{ width: `${match.confidence}%` }}
+          style={{ width: `${lockWinPct}%` }}
         />
       </div>
 
@@ -376,13 +383,7 @@ function LockOfDaySection({ match }: { match: ESPNMatchWithPrediction }) {
 
       <div className="lock-meta">
         <div className="meta-item">
-          <div className="meta-value">{match.confidence}%</div>
-          <div className="meta-label">Confidence</div>
-        </div>
-        <div className="meta-item">
-          <div className="meta-value">
-            {Math.max(match.p1WinPct, match.p2WinPct)}%
-          </div>
+          <div className="meta-value">{lockWinPct}%</div>
           <div className="meta-label">Win Prob</div>
         </div>
         <div className="meta-item">
@@ -390,6 +391,10 @@ function LockOfDaySection({ match }: { match: ESPNMatchWithPrediction }) {
             {match.surface}
           </div>
           <div className="meta-label">Surface</div>
+        </div>
+        <div className="meta-item">
+          <div className="meta-value">{match.tour}</div>
+          <div className="meta-label">Tour</div>
         </div>
       </div>
     </div>
